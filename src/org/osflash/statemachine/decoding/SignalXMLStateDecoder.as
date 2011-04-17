@@ -23,9 +23,13 @@ import org.robotlegs.core.IInjector;
  */
 public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
-    public static const COMMAND_CLASS_NOT_REGISTERED:String = "These commands need to be added to the StateDecoder: ";
-    public static const COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL:String = "A command class can be mapped once only to the same signal: ";
-
+    private static const COMMAND_CLASS_NOT_REGISTERED:String = "These commands need to be added to the StateDecoder: ";
+    private static const COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL:String = "A command class can be mapped once only to the same signal: ";
+    private static const STATE_NAME_NOT_DECLARED:String = "The name attribute for this state element is undefined:";
+    private static const TRANSITION_NAME_NOT_DECLARED:String = "The name attribute for this transition element is undefined:";
+    private static const TRANSITION_TARGET_NOT_DECLARED:String = "The target attribute for this transition element is undefined:";
+    private static const STATE_EQUALS:String = " state = ";
+    private static const POSITION_EQUALS:String = " position = ";
     /**
      * @private
      */
@@ -124,6 +128,9 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
      * @return an instance of the state described in the data
      */
     protected function getState(stateDef:Object):ISignalState {
+
+        if (stateDef.@name == undefined)
+            throw new StateDecodeError(STATE_NAME_NOT_DECLARED + POSITION_EQUALS + stateDef.childIndex());
         return new SignalState(stateDef.@name.toString());
     }
 
@@ -136,7 +143,11 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
         var transitions:XMLList = stateDef..transition as XMLList;
         for (var i:int; i < transitions.length(); i++) {
             var transDef:XML = transitions[i];
-            state.defineTrans(String(transDef.@action), String(transDef.@target));
+            if( transDef.@name == undefined)
+                throw new StateDecodeError( TRANSITION_NAME_NOT_DECLARED + STATE_EQUALS +  state.name + POSITION_EQUALS + transDef.childIndex() );
+            if( transDef.@target == undefined)
+                throw new StateDecodeError( TRANSITION_TARGET_NOT_DECLARED + STATE_EQUALS +  state.name + POSITION_EQUALS + transDef.childIndex() );
+            state.defineTrans(String(transDef.@name), String(transDef.@target));
         }
     }
 
@@ -194,11 +205,11 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
             if (item.isError)
                 throw new StateDecodeError(item.error);
             else if (item.guardCommandClassNames == null) {
-                var commandClass:Class = getAndValidateClass(item.commandClassName);
-                if (commandClass != null && doesNotHaveMapping(signal, commandClass))
-                    signalCommandMap.mapSignal(signal, commandClass);
+                var commandClass:Class = getAndValidateClass( item.commandClassName );
+                if (commandClass != null && doesNotHaveMapping( signal, commandClass ))
+                    signalCommandMap.mapSignal( signal, commandClass );
             } else {
-                mapGuardedSignalCommand(signal, item)
+                mapGuardedSignalCommand( signal, item )
             }
 
         }
@@ -206,7 +217,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
     private function mapGuardedSignalCommand(signal:ISignal, item:PhaseDecoderItem):void {
         var guardClasses:Array = [];
-        var commandClass:Class = getAndValidateClass( item.commandClassName );
+        var commandClass:Class = getAndValidateClass(item.commandClassName);
         var fallBackCommandClass:Class = ( item.hasFallback ) ? getAndValidateClass(item.fallbackCommandClassName) : null;
 
         for each (var guardClassName:String in item.guardCommandClassNames) {
@@ -214,14 +225,14 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
             if (g != null)guardClasses.push(g);
         }
 
-        if (    guardClasses.length != item.guardCommandClassNames.length ||
+        if (guardClasses.length != item.guardCommandClassNames.length ||
                 commandClass == null ||
                 !doesNotHaveMapping(signal, commandClass)) return;
 
-        if(fallBackCommandClass == null )
+        if (fallBackCommandClass == null)
             signalCommandMap.mapGuardedSignal(signal, commandClass, guardClasses);
         else
-            signalCommandMap.mapGuardedSignalWithFallback( signal, commandClass, fallBackCommandClass, guardClasses);
+            signalCommandMap.mapGuardedSignalWithFallback(signal, commandClass, fallBackCommandClass, guardClasses);
     }
 
     private function doesNotHaveMapping(signal:ISignal, commandClass:Class):Boolean {
@@ -372,8 +383,8 @@ internal class PhaseDecoderItem {
     internal var error:String;
 
     public function get isError():Boolean {
-        if( TransitionPhase.ENTERED.equals(phase) || TransitionPhase.TEAR_DOWN.equals(phase) || TransitionPhase.CANCELLED.equals(phase) ) return false;
-        if( hasFallback ) error = ILLEGAL_FALLBACK_COMMAND_DECLARATION;
+        if (TransitionPhase.ENTERED.equals(phase) || TransitionPhase.TEAR_DOWN.equals(phase) || TransitionPhase.CANCELLED.equals(phase)) return false;
+        if (hasFallback) error = ILLEGAL_FALLBACK_COMMAND_DECLARATION;
         return hasFallback;
     }
 
