@@ -170,11 +170,11 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
     private var FSM:XML =
             <fsm initial={STARTING}>
                 <state  name={STARTING}>
-                    <transition action={TO_FIRST} target={FIRST}/>
-                    <transition action={TO_SECOND} target={SECOND}/>
-                    <transition action={TO_THIRD} target={THIRD}/>
-                    <transition action={TO_FOURTH} target={FOURTH}/>
-                    <transition action={TO_FIFTH} target={FIFTH}/>
+                    <transition name={TO_FIRST} target={FIRST}/>
+                    <transition name={TO_SECOND} target={SECOND}/>
+                    <transition name={TO_THIRD} target={THIRD}/>
+                    <transition name={TO_FOURTH} target={FOURTH}/>
+                    <transition name={TO_FIFTH} target={FIFTH}/>
                 </state>
 
                 <state name={FIRST} >
@@ -205,7 +205,7 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
                     <tearDown>
                         <commandClass classPath="SampleCommandD"/>
                     </tearDown>
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={FIFTH}>
@@ -217,7 +217,7 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
                         <commandClass classPath="CancellationHandleCommand"/>
                     </cancelled>
 
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={EMPTY}/>

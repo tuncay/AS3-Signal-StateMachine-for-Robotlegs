@@ -55,124 +55,124 @@ public class SignalStateMachineSignalCommandMappingTests {
     }
 
     [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
-     public function SampleCommandA_not_added_to_fsmInjector():void {
-     injectFSM();
-     }
+    public function SampleCommandA_not_added_to_fsmInjector():void {
+        injectFSM();
+    }
 
-     [Test]
-     public function SECOND_state_enteringGuard_signal_should_not_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
-     Assert.assertFalse(state.hasEnteringGuard);
-     }
+    [Test]
+    public function SECOND_state_enteringGuard_signal_should_not_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
+        Assert.assertFalse(state.hasEnteringGuard);
+    }
 
-     [Test]
-     public function SECOND_state_exitingGuard_signal_should_not_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
-     Assert.assertFalse(state.hasExitingGuard);
-     }
+    [Test]
+    public function SECOND_state_exitingGuard_signal_should_not_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
+        Assert.assertFalse(state.hasExitingGuard);
+    }
 
-     [Test]
-     public function SECOND_state_cancelled_signal_should_not_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
-     Assert.assertFalse(state.hasCancelled);
-     }
+    [Test]
+    public function SECOND_state_cancelled_signal_should_not_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
+        Assert.assertFalse(state.hasCancelled);
+    }
 
-     [Test]
-     public function SECOND_state_tearDown_signal_should_not_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
-     Assert.assertFalse(state.hasTearDown);
-     }
+    [Test]
+    public function SECOND_state_tearDown_signal_should_not_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, SECOND) as SignalState;
+        Assert.assertFalse(state.hasTearDown);
+    }
 
-     [Test]
-     public function THIRD_state_entered_signal_should_not_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertFalse(state.hasEntered);
-     }
+    [Test]
+    public function THIRD_state_entered_signal_should_not_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertFalse(state.hasEntered);
+    }
 
-     [Test]
-     public function THIRD_state_enteringGuard_signal_should_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(state.hasEnteringGuard);
-     }
+    [Test]
+    public function THIRD_state_enteringGuard_signal_should_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(state.hasEnteringGuard);
+    }
 
-     [Test]
-     public function THIRD_state_exitingGuard_signal_should_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(state.hasExitingGuard);
-     }
+    [Test]
+    public function THIRD_state_exitingGuard_signal_should_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(state.hasExitingGuard);
+    }
 
-     [Test]
-     public function THIRD_state_tearDown_signal_should_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(state.hasTearDown);
-     }
+    [Test]
+    public function THIRD_state_tearDown_signal_should_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(state.hasTearDown);
+    }
 
-     [Test]
-     public function THIRD_state_cancelled_signal_should_be_instantiated():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(state.hasCancelled);
-     }
+    [Test]
+    public function THIRD_state_cancelled_signal_should_be_instantiated():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(state.hasCancelled);
+    }
 
-     [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
-     public function Guards_not_added_to_fsmInjector():void {
-     fsmInjector.addClass(SampleCommandA);
-     fsmInjector.addClass(SampleCommandB);
-     fsmInjector.addClass(SampleCommandC);
-     injectFSM();
+    [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
+    public function Guards_not_added_to_fsmInjector():void {
+        fsmInjector.addClass(SampleCommandA);
+        fsmInjector.addClass(SampleCommandB);
+        fsmInjector.addClass(SampleCommandC);
+        injectFSM();
 
-     }
+    }
 
-     [Test]
-     public function SampleCommandA_and_B_should_be_mapped_to_entered_signal_in_FOURTH_state():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, FOURTH) as SignalState;
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.entered, SampleCommandA));
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.entered, SampleCommandB));
-     }
+    [Test]
+    public function SampleCommandA_and_B_should_be_mapped_to_entered_signal_in_FOURTH_state():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, FOURTH) as SignalState;
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.entered, SampleCommandA));
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.entered, SampleCommandB));
+    }
 
-     [Test]
-     public function SampleCommandB_should_be_mapped_to_enteringGuard_signal_in_THIRD_state():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.enteringGuard, SampleCommandB));
-     }
+    [Test]
+    public function SampleCommandB_should_be_mapped_to_enteringGuard_signal_in_THIRD_state():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.enteringGuard, SampleCommandB));
+    }
 
-     [Test]
-     public function SampleCommandC_should_be_mapped_to_exitingGuard_signal_in_THIRD_state():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.exitingGuard, SampleCommandC));
-     }
+    [Test]
+    public function SampleCommandC_should_be_mapped_to_exitingGuard_signal_in_THIRD_state():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.exitingGuard, SampleCommandC));
+    }
 
-     [Test]
-     public function SampleCommandA_and_B_should_be_mapped_to_tearDown_signal_in_THIRD_state():void {
-     addClasses();
-     injectFSM();
-     var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.tearDown, SampleCommandA));
-     Assert.assertTrue(signalCommandMap.hasSignalCommand(state.tearDown, SampleCommandB));
-     }
+    [Test]
+    public function SampleCommandA_and_B_should_be_mapped_to_tearDown_signal_in_THIRD_state():void {
+        addClasses();
+        injectFSM();
+        var state:SignalState = injector.getInstance(ISignalState, THIRD) as SignalState;
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.tearDown, SampleCommandA));
+        Assert.assertTrue(signalCommandMap.hasSignalCommand(state.tearDown, SampleCommandB));
+    }
 
     public function injectFSM():void {
         fsmInjector.inject();
@@ -199,7 +199,7 @@ public class SignalStateMachineSignalCommandMappingTests {
     private var FSM:XML =
             <fsm initial={STARTING}>
                 <state  name={STARTING}>
-                    <transition action={NEXT} target={SECOND}/>
+                    <transition name={NEXT} target={SECOND}/>
                 </state>
 
                 <state name={SECOND} inject="true">
@@ -207,7 +207,7 @@ public class SignalStateMachineSignalCommandMappingTests {
                         <commandClass classPath="SampleCommandA"/>
                     </entered>
                 >
-                    <transition action={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={THIRD}/>
                 </state>
 
                 <state name={THIRD} inject="true">
@@ -224,10 +224,10 @@ public class SignalStateMachineSignalCommandMappingTests {
                         <commandClass classPath="SampleCommandA"/>
                         <commandClass classPath="SampleCommandB"/>
                     </tearDown>
-                    <transition action={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={THIRD}/>
                 </state>
 
-                     <state name={FOURTH} inject="true">
+                <state name={FOURTH} inject="true">
                     <entered>
                         <commandClass classPath="SampleCommandA" />
                         <commandClass classPath="SampleCommandB" >
@@ -238,7 +238,7 @@ public class SignalStateMachineSignalCommandMappingTests {
                             <guardClass classPath="HappyGuard" />
                         </commandClass>
                     </entered>
-                    <transition action={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={THIRD}/>
                 </state>
 
 

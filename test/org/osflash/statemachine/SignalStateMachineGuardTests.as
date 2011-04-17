@@ -237,13 +237,13 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
     private var FSM:XML =
             <fsm initial={STARTING}>
                 <state  name={STARTING}>
-                    <transition action={TO_FIRST} target={FIRST}/>
-                    <transition action={TO_SECOND} target={SECOND}/>
-                    <transition action={TO_THIRD} target={THIRD}/>
-                    <transition action={TO_FOURTH} target={FOURTH}/>
-                    <transition action={TO_FIFTH} target={FIFTH}/>
-                    <transition action={TO_SIXTH} target={SIXTH}/>
-                    <transition action={TO_SEVENTH} target={SEVENTH}/>
+                    <transition name={TO_FIRST} target={FIRST}/>
+                    <transition name={TO_SECOND} target={SECOND}/>
+                    <transition name={TO_THIRD} target={THIRD}/>
+                    <transition name={TO_FOURTH} target={FOURTH}/>
+                    <transition name={TO_FIFTH} target={FIFTH}/>
+                    <transition name={TO_SIXTH} target={SIXTH}/>
+                    <transition name={TO_SEVENTH} target={SEVENTH}/>
                 </state>
 
                 <state name={FIRST} >
@@ -345,7 +345,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
                             <guardClass classPath="HappyGuard" />
                         </commandClass>
                     </tearDown>
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={FIFTH}>
@@ -357,7 +357,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
                             <guardClass classPath="HappyGuard"/>
                         </commandClass>
                     </cancelled>
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={SIXTH}>
@@ -369,7 +369,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
                             <guardClass classPath="GrumpyGuard"/>
                         </commandClass>
                     </cancelled>
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
                 <state name={EMPTY}/>
             </fsm>
@@ -401,10 +401,11 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
 
 
     private var TESTING_FALLBACK_COMMANDS:XML =
+
             <fsm initial={STARTING}>
                 <state name={STARTING}>
-                    <transition action={TO_FIRST} target={FIRST}/>
-                    <transition action={TO_SECOND} target={SECOND}/>
+                    <transition name={TO_FIRST} target={FIRST}/>
+                    <transition name={TO_SECOND} target={SECOND}/>
                 </state>
                 <state name={FIRST}>
                     <entered>
@@ -427,7 +428,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
                         </commandClass>
                     </tearDown>
 
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={SECOND}>
@@ -445,7 +446,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
                         <commandClass classPath="CancelTransitionCommand"/>
                     </exitingGuard>
 
-                    <transition action={TO_EMPTY} target={EMPTY}/>
+                    <transition name={TO_EMPTY} target={EMPTY}/>
                 </state>
 
                 <state name={EMPTY}/>

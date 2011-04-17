@@ -85,6 +85,27 @@ public class SignalStateMachineBasicTests {
         Assert.assertNull( fsmController.currentStateName);
     }
 
+    [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
+    public function state_name_attribute_undefined():void {
+        setup(STATE_NAME_UNDEFINED_FSM);
+        /*var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
+        Assert.assertNull( fsmController.currentStateName);*/
+    }
+
+    [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
+    public function transition_name_attribute_undefined():void {
+        setup(TRANSITION_NAME_UNDEFINED_FSM);
+        /*var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
+        Assert.assertNull( fsmController.currentStateName);*/
+    }
+
+    [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
+    public function transition_target_attribute_undefined():void {
+        setup(TRANSITION_TARGET_UNDEFINED_FSM);
+        /*var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
+        Assert.assertNull( fsmController.currentStateName);*/
+    }
+
     [Test]
     public function SECOND_state_should_lazily_instantiate_cancellation_signal():void {
         setup(FSM);
@@ -673,25 +694,44 @@ public class SignalStateMachineBasicTests {
     private var FSM:XML =
             <fsm initial={STARTING}>
                 <state  name={STARTING}>
-                    <transition action={NEXT} target={SECOND}/>
-                    <transition action={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
+                    <transition name={NEXT} target={SECOND}/>
+                    <transition name={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
                 </state>
 
                 <state name={SECOND} inject="true">
-                    <transition action={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={THIRD}/>
                 </state>
 
                 <state name={THIRD} inject="true">
-                    <transition action={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={THIRD}/>
                 </state>
 
+            </fsm>;
+
+     private var STATE_NAME_UNDEFINED_FSM:XML =
+            <fsm >
+                <state />
+            </fsm>;
+
+    private var TRANSITION_NAME_UNDEFINED_FSM:XML =
+            <fsm >
+                <state name = "STARTING" >
+                    <transition target={THIRD}/>
+                </state>
+            </fsm>;
+
+      private var TRANSITION_TARGET_UNDEFINED_FSM:XML =
+            <fsm >
+                <state name = "STARTING" >
+                    <transition name={NEXT}/>
+                </state>
             </fsm>;
 
     private var TESTING_UNDEFINED_INITIAL_VALUE_FSM:XML =
             <fsm >
                 <state  name={STARTING}>
-                    <transition action={NEXT} target={SECOND}/>
-                    <transition action={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
+                    <transition name={NEXT} target={SECOND}/>
+                    <transition name={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
                 </state>
 
             </fsm>;
@@ -700,8 +740,8 @@ public class SignalStateMachineBasicTests {
     private var TESTING_INITIAL_VALUE_IS_UNDEFINED_STATE_FSM:XML =
             <fsm initial={SECOND}>
                 <state  name={STARTING}>
-                    <transition action={NEXT} target={SECOND}/>
-                    <transition action={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
+                    <transition name={NEXT} target={SECOND}/>
+                    <transition name={TO_NON_DECLARED_TARGET} target={NON_DECLARED_TARGET}/>
                 </state>
 
             </fsm>;
