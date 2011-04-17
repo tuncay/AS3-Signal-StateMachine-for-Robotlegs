@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- declare complex elements-->
+    <xs:element name="fsm">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="state" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute ref="initial" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="state">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:group ref="phaseGroup" minOccurs="0"/>
+                <xs:element ref="transition" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute ref="name" use="required"/>
+            <xs:attribute ref="inject"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="transition">
+        <xs:complexType>
+            <xs:attribute ref="name" use="required"/>
+            <xs:attribute ref="target" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="entered">
+        <xs:complexType>
+            <xs:group ref="commandClassGroup" minOccurs="1"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="enteringGuard">
+        <xs:complexType>
+            <xs:group ref="commandClassGroup" minOccurs="1"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="exitingGuard">
+        <xs:complexType>
+            <xs:group ref="commandClassGroup" minOccurs="1"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="tearDown">
+        <xs:complexType>
+            <xs:group ref="commandClassGroup" minOccurs="1"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="cancelled">
+        <xs:complexType>
+            <xs:group ref="commandClassGroup" minOccurs="1"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="commandClass">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="guardClass" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute ref="classPath" use="required"/>
+            <xs:attribute ref="fallback"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="guardClass">
+        <xs:complexType>
+            <xs:attribute ref="classPath" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- declare groups-->
+    <xs:group name="commandClassGroup">
+        <xs:sequence>
+            <xs:element ref="commandClass" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:group>
+
+    <xs:group name="phaseGroup">
+        <xs:sequence>
+            <xs:element ref="entered" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="tearDown" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="enteringGuard" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="exitingGuard" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="cancelled" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:group>
+
+    <!-- declare attributes-->
+    <xs:attribute name="initial" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="target" type="xs:string"/>
+    <xs:attribute name="inject" type="xs:boolean"/>
+    <xs:attribute name="classPath" type="xs:string"/>
+    <xs:attribute name="fallback" type="xs:string"/>
+</xs:schema>
