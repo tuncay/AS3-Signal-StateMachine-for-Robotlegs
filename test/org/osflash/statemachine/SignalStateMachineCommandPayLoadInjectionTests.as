@@ -2,7 +2,7 @@ package org.osflash.statemachine {
 import org.flexunit.Assert;
 import org.osflash.statemachine.core.IFSMController;
 import org.osflash.statemachine.core.IPayload;
-import org.osflash.statemachine.logging.TraceLogger;
+import org.osflash.statemachine.logging.TraceStateLogger;
 import org.osflash.statemachine.supporting.CancelTransitionCommandWithPayload;
 import org.osflash.statemachine.supporting.CancellationHandleCommandWithPayload;
 import org.osflash.statemachine.supporting.IPayloadReporter;
@@ -40,7 +40,7 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         signalCommandMap = new GuardedSignalCommandMap(injector);
         fsmInjector = new SignalFSMInjector(injector, signalCommandMap);
 
-        fsmInjector.initiate(FSM, new TraceLogger());
+        fsmInjector.initiate(FSM, new TraceStateLogger());
     }
 
     [After]
@@ -65,7 +65,7 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var payload:Object = {};
         var expected:Array = [payload];
-        fsmController.action(TO_FIRST, payload);
+        fsmController.transition(TO_FIRST, payload);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedPayloads])
     }
 
@@ -80,7 +80,7 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var payload:Object = {};
         var expected:Array = [payload,payload,payload];
-        fsmController.action(TO_SECOND, payload);
+        fsmController.transition(TO_SECOND, payload);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedPayloads])
     }
 
@@ -97,8 +97,8 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         var payloadOne:Object = {id:"payloadOne"};
         var payloadTwo:Object = {id:"payloadTwo"};
         var expected:Array = [payloadOne,payloadOne,payloadTwo];
-        fsmController.action(TO_FOURTH, payloadOne);
-        fsmController.action(TO_EMPTY, payloadTwo);
+        fsmController.transition(TO_FOURTH, payloadOne);
+        fsmController.transition(TO_EMPTY, payloadTwo);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedPayloads])
     }
 
@@ -113,8 +113,8 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var payload:Object = {};
         var expected:Array = [payload,payload];
-        fsmController.action(TO_FIFTH);
-        fsmController.action(TO_EMPTY, payload);
+        fsmController.transition(TO_FIFTH);
+        fsmController.transition(TO_EMPTY, payload);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedPayloads]);
         Assert.assertEquals(CancelTransitionCommandWithPayload.REASON, reason);
     }
@@ -129,8 +129,8 @@ public class SignalStateMachineCommandPayLoadInjectionTests implements IPayloadR
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var payload:Object = {};
-        fsmController.action(TO_SIXTH);
-        fsmController.action(TO_EMPTY, payload);
+        fsmController.transition(TO_SIXTH);
+        fsmController.transition(TO_EMPTY, payload);
     }
 
     public function reportPayload(payload:IPayload):void {

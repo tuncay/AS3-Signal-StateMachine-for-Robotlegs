@@ -1,7 +1,6 @@
 package org.osflash.statemachine {
 import org.flexunit.Assert;
 import org.osflash.statemachine.core.IFSMController;
-import org.osflash.statemachine.logging.TraceLogger;
 import org.osflash.statemachine.supporting.CancelTransitionCommand;
 import org.osflash.statemachine.supporting.CancellationHandleCommand;
 import org.osflash.statemachine.supporting.ICommandReporter;
@@ -60,7 +59,7 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var expected:Array = [SampleCommandA];
-        fsmController.action(TO_FIRST);
+        fsmController.transition(TO_FIRST);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedCommands])
     }
 
@@ -75,18 +74,18 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var expected:Array = [SampleCommandA, SampleCommandB, SampleCommandC];
-        fsmController.action(TO_SECOND);
+        fsmController.transition(TO_SECOND);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedCommands]);
     }
 
-    [Test(expected="org.osflash.statemachine.errors.StateDecodeError")]
+    [Test(expected="org.osflash.statemachine.errors.StateDecodingError")]
     public function duplication_of_command_mapped_to_same_signal():void {
         fsmInjector.initiate(FSM_2);
         addClasses();
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var expected:Array = [SampleCommandA, SampleCommandB];
-        fsmController.action(TO_THIRD);
+        fsmController.transition(TO_THIRD);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedCommands]);
     }
 
@@ -101,8 +100,8 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var expected:Array = [SampleCommandA, SampleCommandB, SampleCommandC, SampleCommandD];
-        fsmController.action(TO_FOURTH);
-        fsmController.action(TO_EMPTY);
+        fsmController.transition(TO_FOURTH);
+        fsmController.transition(TO_EMPTY);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedCommands]);
     }
 
@@ -117,8 +116,8 @@ public class SignalStateMachineCommandExecutionTests implements ICommandReporter
         injectFSM();
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var expected:Array = [CancelTransitionCommand,CancellationHandleCommand];
-        fsmController.action(TO_FIFTH);
-        fsmController.action(TO_EMPTY);
+        fsmController.transition(TO_FIFTH);
+        fsmController.transition(TO_EMPTY);
         Assert.assertWithApply(assertArraysEqual, [expected, reportedCommands]);
     }
 

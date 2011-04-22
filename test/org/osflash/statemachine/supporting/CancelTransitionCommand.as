@@ -14,7 +14,7 @@ public class CancelTransitionCommand {
     public function execute():void
     {
         reporter.reportCommand(CancelTransitionCommand);
-        fsmController.cancel(REASON, PAYLOAD);
+        fsmController.cancelStateTransition(REASON, PAYLOAD);
 
     }
 }

@@ -18,7 +18,7 @@ public class CancelTransitionCommandWithPayload {
 
     public function execute():void {
         reporter.reportPayload(payload);
-        fsmController.cancel(REASON, payload);
+        fsmController.cancelStateTransition(REASON, payload);
 
     }
 }
