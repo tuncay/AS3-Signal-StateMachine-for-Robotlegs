@@ -1,15 +1,19 @@
 package org.osflash.statemachine {
-	import org.osflash.statemachine.core.IFSMController;
-	import org.osflash.statemachine.core.IFSMInjector;
-	import org.osflash.statemachine.core.ILoggable;
-	import org.osflash.statemachine.core.IStateMachine;
-	import org.osflash.statemachine.decoding.SignalXMLStateDecoder;
-	import org.osflash.statemachine.transitioning.SignalTransitionController;
+import org.osflash.statemachine.base.BaseStateMachine;
+import org.osflash.statemachine.base.StateModel;
+import org.osflash.statemachine.base.StateModelInjector;
+import org.osflash.statemachine.core.IFSMController;
+import org.osflash.statemachine.core.IFSMProperties;
+import org.osflash.statemachine.core.IStateLogger;
+import org.osflash.statemachine.core.IStateModel;
+import org.osflash.statemachine.core.IStateModelInjector;
+import org.osflash.statemachine.core.IStateModelOwner;
+import org.osflash.statemachine.decoding.SignalXMLStateDecoder;
+import org.osflash.statemachine.transitioning.SignalTransitionController;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
-	import org.robotlegs.core.ISignalCommandMap;
 
-	/**
+/**
 	 * A helper class that wraps the injection of the Signal StateMachine
 	 * to simplify creation.
 	 */
@@ -33,17 +37,17 @@ import org.robotlegs.core.IInjector;
 		/**
 		 * @private
 		 */
-		private var _fsmInjector:IFSMInjector;
+		private var _fsmInjector:IStateModelInjector;
 
 		/**
 		 * @private
 		 */
-		private var _stateMachine:IStateMachine;
+		private var _stateMachine:BaseStateMachine;
 
 		/**
 		 * @private
 		 */
-		private var _transitionController:SignalTransitionController;
+		private var _model:IStateModelOwner;
 
 		/**
 		 * Creates an instance of the injector
@@ -60,15 +64,14 @@ import org.robotlegs.core.IInjector;
 		 * Initiates the Injector
 		 * @param stateDefinition the StateMachine declaration
 		 */
-		public function initiate( stateDefinition:XML, logger:ILoggable=null ):void{
+		public function initiate( stateDefinition:XML, logger:IStateLogger=null ):void{
 			// create a SignalStateDecoder and pass it the State Declaration
 			_decoder = new SignalXMLStateDecoder( stateDefinition, _injector, _signalCommandMap );
 			// add it the FSMInjector
-			_fsmInjector = new FSMInjector( _decoder );
-			// create a transitionController
-			_transitionController = new SignalTransitionController( null, logger );
-			// and pass it to the StateMachine
-			_stateMachine = new StateMachine( _transitionController, logger );
+			_fsmInjector = new StateModelInjector( _decoder );
+
+            _model = new StateModel();
+			_stateMachine = new SignalTransitionController( _model, logger );
 		}
 
 		/**
@@ -83,33 +86,21 @@ import org.robotlegs.core.IInjector;
 		}
 
 		/**
-		 * Test to determine whether a particular class has already been added
-		 * to the decoder
-		 * @param name this can either be the name, the fully qualified name or an instance of the Class
-		 * @return
-		 */
-		public function hasClass( name:Object ):Boolean{
-			return _decoder.hasClass( name );
-		}
-
-		/**
 		 * Injects the StateMachine
 		 */
 		public function inject():void{
 
+             _fsmInjector.inject( _model );
+
 			// inject the statemachine (mainly to make sure that it doesn't get GCd )
-			_injector.mapValue( IStateMachine, _stateMachine );
+			_injector.mapValue( IFSMController, _stateMachine );
+
 			// inject the fsmController to allow actors to control fsm
-			_injector.mapValue( IFSMController, _transitionController.fsmController );
-			
-			// inject the statemachine, it will proceed to the initial state.
-			// NB no injection rules have been set for view or model yet, the initial state
-			// should be a resting one and the next state should be triggered by the
-			// onApplicationComplete event in the ApplicationMediator
-			_fsmInjector.inject( _stateMachine );
+			_injector.mapValue( IFSMProperties, _stateMachine );
 
+            _injector.mapValue( IStateModel, _model );
 
-
+            _stateMachine.transitionToInitialState();
 
 		}
 
@@ -126,7 +117,7 @@ import org.robotlegs.core.IInjector;
 			_signalCommandMap = null;
 
 			_stateMachine = null;
-			_transitionController = null;
+			_model = null;
 		}
 	}
 }

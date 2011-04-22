@@ -3,9 +3,9 @@ import org.osflash.signals.ISignal;
 import org.osflash.statemachine.base.BaseXMLStateDecoder;
 import org.osflash.statemachine.core.ISignalState;
 import org.osflash.statemachine.core.IState;
-import org.osflash.statemachine.errors.StateDecodeError;
+import org.osflash.statemachine.errors.StateDecodingError;
 import org.osflash.statemachine.states.SignalState;
-import org.osflash.statemachine.transitioning.TransitionPhase;
+import org.osflash.statemachine.transitioning.SignalTransitionPhase;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
@@ -25,11 +25,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
     private static const COMMAND_CLASS_NOT_REGISTERED:String = "These commands need to be added to the StateDecoder: ";
     private static const COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL:String = "A command class can be mapped once only to the same signal: ";
-    private static const STATE_NAME_NOT_DECLARED:String = "The name attribute for this state element is undefined:";
-    private static const TRANSITION_NAME_NOT_DECLARED:String = "The name attribute for this transition element is undefined:";
-    private static const TRANSITION_TARGET_NOT_DECLARED:String = "The target attribute for this transition element is undefined:";
-    private static const STATE_EQUALS:String = " state = ";
-    private static const POSITION_EQUALS:String = " position = ";
+
     /**
      * @private
      */
@@ -65,7 +61,6 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
     override public final function decodeState(stateDef:Object):IState {
         // Create State object
         var state:ISignalState = getState(stateDef);
-        decodeTransitions(state, stateDef);
         injectState(state, stateDef);
         mapSignals(state, stateDef);
         return state;
@@ -79,7 +74,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
         injector = null;
         signalCommandMap = null;
         if (classBagMap != null) {
-            for each (var cb:ClassBag in classBagMap)    cb.destroy();
+            for each (var cb:ClassReflector in classBagMap)    cb.destroy();
         }
         classBagMap = null;
         super.destroy();
@@ -95,7 +90,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
     public function addClass(value:Class):Boolean {
         if (classBagMap == null) classBagMap = [];
         if (hasClass(value)) return false;
-        classBagMap.push(new ClassBag(value));
+        classBagMap.push(new ClassReflector(value));
         return true;
     }
 
@@ -115,7 +110,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
      * @return the class reference
      */
     public function getClass(name:Object):Class {
-        for each (var cb:ClassBag in classBagMap) {
+        for each (var cb:ClassReflector in classBagMap) {
             if (cb.equals(name)) return cb.payload;
         }
         return null;
@@ -128,28 +123,9 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
      * @return an instance of the state described in the data
      */
     protected function getState(stateDef:Object):ISignalState {
-
-        if (stateDef.@name == undefined)
-            throw new StateDecodeError(STATE_NAME_NOT_DECLARED + POSITION_EQUALS + stateDef.childIndex());
         return new SignalState(stateDef.@name.toString());
     }
 
-    /**
-     * Decodes the State's transitions from the state declaration
-     * @param state the state into which to inject the transitions
-     * @param stateDef the state's declaration
-     */
-    protected function decodeTransitions(state:IState, stateDef:Object):void {
-        var transitions:XMLList = stateDef..transition as XMLList;
-        for (var i:int; i < transitions.length(); i++) {
-            var transDef:XML = transitions[i];
-            if( transDef.@name == undefined)
-                throw new StateDecodeError( TRANSITION_NAME_NOT_DECLARED + STATE_EQUALS +  state.name + POSITION_EQUALS + transDef.childIndex() );
-            if( transDef.@target == undefined)
-                throw new StateDecodeError( TRANSITION_TARGET_NOT_DECLARED + STATE_EQUALS +  state.name + POSITION_EQUALS + transDef.childIndex() );
-            state.defineTrans(String(transDef.@name), String(transDef.@target));
-        }
-    }
 
     /**
      * Injects a IState into the DI Container if it is marked for injection in its declaration
@@ -171,11 +147,11 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
      */
     protected function mapSignals(signalState:ISignalState, stateDef:Object):void {
 
-        var entered:PhaseDecoder = new PhaseDecoder(TransitionPhase.ENTERED, stateDef.entered);
-        var enteringGuard:PhaseDecoder = new PhaseDecoder(TransitionPhase.ENTERING_GUARD, stateDef.enteringGuard);
-        var exitingGuard:PhaseDecoder = new PhaseDecoder(TransitionPhase.EXITING_GUARD, stateDef.exitingGuard);
-        var tearDown:PhaseDecoder = new PhaseDecoder(TransitionPhase.TEAR_DOWN, stateDef.tearDown);
-        var cancelled:PhaseDecoder = new PhaseDecoder(TransitionPhase.CANCELLED, stateDef.cancelled);
+        var entered:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.ENTERED, stateDef.entered);
+        var enteringGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.ENTERING_GUARD, stateDef.enteringGuard);
+        var exitingGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.EXITING_GUARD, stateDef.exitingGuard);
+        var tearDown:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.TEAR_DOWN, stateDef.tearDown);
+        var cancelled:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.CANCELLED, stateDef.cancelled);
 
         if (!entered.isNull)
             mapSignalCommand(signalState.entered, entered);
@@ -193,7 +169,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
             mapSignalCommand(signalState.cancelled, cancelled);
 
         if (errors.length > 0)
-            throw new StateDecodeError(COMMAND_CLASS_NOT_REGISTERED + errors.toString());
+            throw new StateDecodingError(COMMAND_CLASS_NOT_REGISTERED + errors.toString());
     }
 
     /**
@@ -203,7 +179,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
     private function mapSignalCommand(signal:ISignal, phaseDecoder:PhaseDecoder):void {
         for each (var item:PhaseDecoderItem in phaseDecoder.decodedItems) {
             if (item.isError)
-                throw new StateDecodeError(item.error);
+                throw new StateDecodingError(item.error);
             else if (item.guardCommandClassNames == null) {
                 var commandClass:Class = getAndValidateClass( item.commandClassName );
                 if (commandClass != null && doesNotHaveMapping( signal, commandClass ))
@@ -237,7 +213,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
     private function doesNotHaveMapping(signal:ISignal, commandClass:Class):Boolean {
         if (signalCommandMap.hasSignalCommand(signal, commandClass))
-            throw new StateDecodeError(COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL);
+            throw new StateDecodingError(COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL);
         return true;
     }
 
@@ -253,14 +229,14 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
 import flash.utils.describeType;
 
-import org.osflash.statemachine.core.IClassBag;
+import org.osflash.statemachine.core.IClassReflector;
 import org.osflash.statemachine.core.ITransitionPhase;
-import org.osflash.statemachine.transitioning.TransitionPhase;
+import org.osflash.statemachine.transitioning.SignalTransitionPhase;
 
 /**
  * Wrapper class for a Class reference.
  */
-internal class ClassBag implements IClassBag {
+internal class ClassReflector implements IClassReflector {
 
     private var _pkg:String;
 
@@ -271,7 +247,7 @@ internal class ClassBag implements IClassBag {
     /**
      * Wraps and reflects a class reference instance )
      */
-    public function ClassBag(c:Class):void {
+    public function ClassReflector(c:Class):void {
         _payload = c;
         describeClass(c);
     }
@@ -383,7 +359,7 @@ internal class PhaseDecoderItem {
     internal var error:String;
 
     public function get isError():Boolean {
-        if (TransitionPhase.ENTERED.equals(phase) || TransitionPhase.TEAR_DOWN.equals(phase) || TransitionPhase.CANCELLED.equals(phase)) return false;
+        if (SignalTransitionPhase.ENTERED.equals(phase) || SignalTransitionPhase.TEAR_DOWN.equals(phase) || SignalTransitionPhase.CANCELLED.equals(phase)) return false;
         if (hasFallback) error = ILLEGAL_FALLBACK_COMMAND_DECLARATION;
         return hasFallback;
     }
