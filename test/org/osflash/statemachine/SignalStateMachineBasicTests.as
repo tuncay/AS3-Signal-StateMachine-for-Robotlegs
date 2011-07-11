@@ -5,7 +5,7 @@ import org.osflash.statemachine.core.IFSMController;
 import org.osflash.statemachine.core.IPayload;
 import org.osflash.statemachine.core.ISignalState;
 import org.osflash.statemachine.states.SignalState;
-import org.osflash.statemachine.transitioning.SignalTransitionPhase;
+import org.osflash.statemachine.transitioning.SignalTransitionPhases;
 import org.robotlegs.adapters.SwiftSuspendersInjector;
 import org.robotlegs.adapters.SwiftSuspendersReflector;
 import org.robotlegs.base.GuardedSignalCommandMap;
@@ -520,8 +520,11 @@ public class SignalStateMachineBasicTests {
 
     [Test]
     public function invoke_transition_from_generic_changed_phase():void {
+
         setup(FSM);
+
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
+
         var onChange:Function = function (stateName:String):void {
             fsmController.transition(NEXT); // to THIRD
         };
@@ -533,47 +536,52 @@ public class SignalStateMachineBasicTests {
 
     [Test]
     public function straight_transition_phases_fired_in_correct_order_and_none_calls_tested():void {
+
         setup(FSM);
+
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var secondState:ISignalState = injector.getInstance(ISignalState, SECOND) as ISignalState;
         var thirdState:ISignalState = injector.getInstance(ISignalState, THIRD) as ISignalState;
-        var expected:Array = [  SignalTransitionPhase.GLOBAL_CHANGED, SignalTransitionPhase.EXITING_GUARD ,
-            SignalTransitionPhase.ENTERING_GUARD, SignalTransitionPhase.TEAR_DOWN,
-            SignalTransitionPhase.ENTERED, SignalTransitionPhase.GLOBAL_CHANGED];
+
+        var expected:Array = [  SignalTransitionPhases.GLOBAL_CHANGED, SignalTransitionPhases.EXITING_GUARD ,
+            SignalTransitionPhases.ENTERING_GUARD, SignalTransitionPhases.TEAR_DOWN,
+            SignalTransitionPhases.ENTERED, SignalTransitionPhases.GLOBAL_CHANGED];
+
         var got:Array = [];
 
         var onExitingGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.EXITING_GUARD);
+            got.push(SignalTransitionPhases.EXITING_GUARD);
         };
         secondState.exitingGuard.add(onExitingGuard);
 
         var onEnteringGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERING_GUARD);
+            got.push(SignalTransitionPhases.ENTERING_GUARD);
         };
         thirdState.enteringGuard.add(onEnteringGuard);
 
         var onCancellation:Function = function (reason:String, payload:IPayload):void {
-            got.push(SignalTransitionPhase.CANCELLED);
+            got.push(SignalTransitionPhases.CANCELLED);
         };
         secondState.cancelled.add(onCancellation);
 
         var onTearDownGuard:Function = function ():void {
-            got.push(SignalTransitionPhase.TEAR_DOWN);
+            got.push(SignalTransitionPhases.TEAR_DOWN);
         };
         secondState.tearDown.add(onTearDownGuard);
 
         var onEntered:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERED);
+            got.push(SignalTransitionPhases.ENTERED);
         };
         thirdState.entered.add(onEntered);
 
         var onChanged:Function = function (stateName:String):void {
-            got.push(SignalTransitionPhase.GLOBAL_CHANGED)
+            got.push(SignalTransitionPhases.GLOBAL_CHANGED)
         };
        fsmController.listenForStateChange(onChanged);
 
         fsmController.transition(NEXT); // to SECOND
         fsmController.transition(NEXT); // to THIRD
+
         Assert.assertWithApply(assertArraysEqual, [expected, got]);
     }
 
@@ -584,38 +592,38 @@ public class SignalStateMachineBasicTests {
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var secondState:ISignalState = injector.getInstance(ISignalState, SECOND) as ISignalState;
         var thirdState:ISignalState = injector.getInstance(ISignalState, THIRD) as ISignalState;
-        var expected:Array = [  SignalTransitionPhase.GLOBAL_CHANGED, SignalTransitionPhase.EXITING_GUARD ,
-            SignalTransitionPhase.CANCELLED];
+        var expected:Array = [  SignalTransitionPhases.GLOBAL_CHANGED, SignalTransitionPhases.EXITING_GUARD ,
+            SignalTransitionPhases.CANCELLED];
         var got:Array = [];
 
         var onExitingGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.EXITING_GUARD);
+            got.push(SignalTransitionPhases.EXITING_GUARD);
             fsmController.cancelStateTransition("cancellationReason")
         };
         secondState.exitingGuard.add(onExitingGuard);
 
         var onEnteringGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERING_GUARD);
+            got.push(SignalTransitionPhases.ENTERING_GUARD);
         };
         thirdState.enteringGuard.add(onEnteringGuard);
 
         var onCancellation:Function = function (reason:String, payload:IPayload):void {
-            got.push(SignalTransitionPhase.CANCELLED);
+            got.push(SignalTransitionPhases.CANCELLED);
         };
         secondState.cancelled.add(onCancellation);
 
         var onTearDownGuard:Function = function ():void {
-            got.push(SignalTransitionPhase.TEAR_DOWN);
+            got.push(SignalTransitionPhases.TEAR_DOWN);
         };
         secondState.tearDown.add(onTearDownGuard);
 
         var onEntered:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERED);
+            got.push(SignalTransitionPhases.ENTERED);
         };
         thirdState.entered.add(onEntered);
 
         var onChanged:Function = function (stateName:String):void {
-            got.push(SignalTransitionPhase.GLOBAL_CHANGED)
+            got.push(SignalTransitionPhases.GLOBAL_CHANGED)
         };
        fsmController.listenForStateChange(onChanged);
 
@@ -630,38 +638,39 @@ public class SignalStateMachineBasicTests {
         var fsmController:IFSMController = injector.getInstance(IFSMController) as IFSMController;
         var secondState:ISignalState = injector.getInstance(ISignalState, SECOND) as ISignalState;
         var thirdState:ISignalState = injector.getInstance(ISignalState, THIRD) as ISignalState;
-        var expected:Array = [  SignalTransitionPhase.GLOBAL_CHANGED, SignalTransitionPhase.EXITING_GUARD ,
-            SignalTransitionPhase.ENTERING_GUARD, SignalTransitionPhase.CANCELLED];
+
+        var expected:Array = [  SignalTransitionPhases.GLOBAL_CHANGED, SignalTransitionPhases.EXITING_GUARD ,
+            SignalTransitionPhases.ENTERING_GUARD, SignalTransitionPhases.CANCELLED];
         var got:Array = [];
 
         var onExitingGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.EXITING_GUARD);
+            got.push(SignalTransitionPhases.EXITING_GUARD);
         };
         secondState.exitingGuard.add(onExitingGuard);
 
         var onEnteringGuard:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERING_GUARD);
+            got.push(SignalTransitionPhases.ENTERING_GUARD);
             fsmController.cancelStateTransition("cancellationReason")
         };
         thirdState.enteringGuard.add(onEnteringGuard);
 
         var onCancellation:Function = function (reason:String, payload:IPayload):void {
-            got.push(SignalTransitionPhase.CANCELLED);
+            got.push(SignalTransitionPhases.CANCELLED);
         };
         secondState.cancelled.add(onCancellation);
 
         var onTearDownGuard:Function = function ():void {
-            got.push(SignalTransitionPhase.TEAR_DOWN);
+            got.push(SignalTransitionPhases.TEAR_DOWN);
         };
         secondState.tearDown.add(onTearDownGuard);
 
         var onEntered:Function = function (payload:IPayload):void {
-            got.push(SignalTransitionPhase.ENTERED);
+            got.push(SignalTransitionPhases.ENTERED);
         };
         thirdState.entered.add(onEntered);
 
         var onChanged:Function = function (stateName:String):void {
-            got.push(SignalTransitionPhase.GLOBAL_CHANGED)
+            got.push(SignalTransitionPhases.GLOBAL_CHANGED)
         };
        fsmController.listenForStateChange(onChanged);
 
@@ -700,8 +709,9 @@ public class SignalStateMachineBasicTests {
                 </state>
 
                 <state name={THIRD} inject="true">
-                    <transition name={NEXT} target={THIRD}/>
+                    <transition name={NEXT} target={SECOND}/>
                 </state>
+
 
             </fsm>;
 

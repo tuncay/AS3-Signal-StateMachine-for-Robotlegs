@@ -1,7 +1,7 @@
 package org.osflash.statemachine.signals {
-	import org.osflash.signals.Signal;
+import org.osflash.signals.PrioritySignal;
 
-	public class Changed extends Signal {
+public class Changed extends PrioritySignal {
 		public function Changed(){
 			super( String );
 		}

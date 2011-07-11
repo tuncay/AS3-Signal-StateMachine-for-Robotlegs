@@ -204,7 +204,7 @@ public class SignalStateMachineGuardTests implements ICommandReporter {
     }
 
     public function assertArraysEqual(expected:Array, got:Array):void {
-        Assert.assertEquals(expected.length, got.length);
+        Assert.assertEquals( "the arrays being compared differ in length", expected.length, got.length);
         if (expected.length != got.length)return;
         for (var i:int = 0; i < expected.length; i++) {
             Assert.assertStrictlyEquals(expected[i], got[i]);

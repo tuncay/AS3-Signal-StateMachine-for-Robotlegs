@@ -1,8 +1,8 @@
 package org.osflash.statemachine.signals {
-	import org.osflash.signals.Signal;
+import org.osflash.signals.PrioritySignal;
 import org.osflash.statemachine.core.IPayload;
 
-public class Entered extends Signal {
+public class Entered extends PrioritySignal {
 		public function Entered(){
 			super( IPayload );
 		}

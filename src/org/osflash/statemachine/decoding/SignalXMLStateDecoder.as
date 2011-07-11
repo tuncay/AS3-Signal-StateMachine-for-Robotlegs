@@ -5,7 +5,7 @@ import org.osflash.statemachine.core.ISignalState;
 import org.osflash.statemachine.core.IState;
 import org.osflash.statemachine.errors.StateDecodingError;
 import org.osflash.statemachine.states.SignalState;
-import org.osflash.statemachine.transitioning.SignalTransitionPhase;
+import org.osflash.statemachine.transitioning.SignalTransitionPhases;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
@@ -147,11 +147,11 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
      */
     protected function mapSignals(signalState:ISignalState, stateDef:Object):void {
 
-        var entered:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.ENTERED, stateDef.entered);
-        var enteringGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.ENTERING_GUARD, stateDef.enteringGuard);
-        var exitingGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.EXITING_GUARD, stateDef.exitingGuard);
-        var tearDown:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.TEAR_DOWN, stateDef.tearDown);
-        var cancelled:PhaseDecoder = new PhaseDecoder(SignalTransitionPhase.CANCELLED, stateDef.cancelled);
+        var entered:PhaseDecoder = new PhaseDecoder(SignalTransitionPhases.ENTERED, stateDef.entered);
+        var enteringGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhases.ENTERING_GUARD, stateDef.enteringGuard);
+        var exitingGuard:PhaseDecoder = new PhaseDecoder(SignalTransitionPhases.EXITING_GUARD, stateDef.exitingGuard);
+        var tearDown:PhaseDecoder = new PhaseDecoder(SignalTransitionPhases.TEAR_DOWN, stateDef.tearDown);
+        var cancelled:PhaseDecoder = new PhaseDecoder(SignalTransitionPhases.CANCELLED, stateDef.cancelled);
 
         if (!entered.isNull)
             mapSignalCommand(signalState.entered, entered);
@@ -231,7 +231,7 @@ import flash.utils.describeType;
 
 import org.osflash.statemachine.core.IClassReflector;
 import org.osflash.statemachine.core.ITransitionPhase;
-import org.osflash.statemachine.transitioning.SignalTransitionPhase;
+import org.osflash.statemachine.transitioning.SignalTransitionPhases;
 
 /**
  * Wrapper class for a Class reference.
@@ -359,7 +359,7 @@ internal class PhaseDecoderItem {
     internal var error:String;
 
     public function get isError():Boolean {
-        if (SignalTransitionPhase.ENTERED.equals(phase) || SignalTransitionPhase.TEAR_DOWN.equals(phase) || SignalTransitionPhase.CANCELLED.equals(phase)) return false;
+        if (SignalTransitionPhases.ENTERED.equals(phase) || SignalTransitionPhases.TEAR_DOWN.equals(phase) || SignalTransitionPhases.CANCELLED.equals(phase)) return false;
         if (hasFallback) error = ILLEGAL_FALLBACK_COMMAND_DECLARATION;
         return hasFallback;
     }
