@@ -1,123 +1,70 @@
 package org.osflash.statemachine {
-import org.osflash.statemachine.base.BaseStateMachine;
-import org.osflash.statemachine.base.StateModel;
-import org.osflash.statemachine.base.StateModelInjector;
+
+import org.osflash.statemachine.base.StateMachine;
 import org.osflash.statemachine.core.IFSMController;
 import org.osflash.statemachine.core.IFSMProperties;
 import org.osflash.statemachine.core.IStateLogger;
-import org.osflash.statemachine.core.IStateModel;
-import org.osflash.statemachine.core.IStateModelInjector;
-import org.osflash.statemachine.core.IStateModelOwner;
+import org.osflash.statemachine.core.IStateProvider;
+import org.osflash.statemachine.decoding.IStateModelDecoder;
 import org.osflash.statemachine.decoding.SignalXMLStateDecoder;
-import org.osflash.statemachine.transitioning.SignalTransitionController;
+import org.osflash.statemachine.decoding.StateModelDecoder;
+import org.osflash.statemachine.model.IPhaseModel;
+import org.osflash.statemachine.model.IStateModel;
+import org.osflash.statemachine.model.ITransitionModel;
+import org.osflash.statemachine.model.ITransitionProperties;
+import org.osflash.statemachine.model.PhaseModel;
+import org.osflash.statemachine.model.StateModel;
+import org.osflash.statemachine.model.TransitionModel;
+import org.osflash.statemachine.model.TransitionProperties;
+import org.osflash.statemachine.transitioning.validators.CancellationValidator;
+import org.osflash.statemachine.transitioning.IPhaseDispatcher;
+import org.osflash.statemachine.transitioning.ITransitionController;
+import org.osflash.statemachine.transitioning.SignalStatePhaseDispatcher;
+import org.osflash.statemachine.transitioning.TransitionController;
+import org.osflash.statemachine.transitioning.validators.TransitionValidator;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-/**
-	 * A helper class that wraps the injection of the Signal StateMachine
-	 * to simplify creation.
-	 */
-	public class SignalFSMInjector {
+public class SignalFSMInjector {
 
-		/**
-		 * @private
-		 */
-		private var _decoder:SignalXMLStateDecoder;
+    private var _decoder:SignalXMLStateDecoder;
+    private var _injector:IInjector;
+    private var _signalCommandMap:IGuardedSignalCommandMap;
+    private var _fsmInjector:IStateModelDecoder;
+    private var _stateMachine:StateMachine;
+    private var _stateModel:IStateModel;
 
-		/**
-		 * @private
-		 */
-		private var _injector:IInjector;
+    public function SignalFSMInjector( injector:IInjector, signalCommandMap:IGuardedSignalCommandMap ) {
+        _injector = injector;
+        _signalCommandMap = signalCommandMap;
+    }
 
-		/**
-		 * @private
-		 */
-		private var _signalCommandMap:IGuardedSignalCommandMap;
+    public function initiate( stateDefinition:XML, logger:IStateLogger = null ):void {
+        const stateModel:IStateModel = new StateModel();
+        const transitionProperties:ITransitionProperties = new TransitionProperties();
+        const transitionModel:ITransitionModel = new TransitionModel( stateModel, transitionProperties );
+        const phaseModel:IPhaseModel = new PhaseModel( stateModel, transitionProperties );
+        const phaseDispatcher:IPhaseDispatcher = new SignalStatePhaseDispatcher( phaseModel, logger );
+        const transitionController:ITransitionController = new TransitionController( transitionModel, phaseDispatcher );
+        _stateModel = stateModel;
+        _stateMachine = new StateMachine( transitionModel, transitionController );
+        _stateMachine.setValidators( new TransitionValidator(), new CancellationValidator() );
+        _decoder = new SignalXMLStateDecoder( stateDefinition, _injector, _signalCommandMap );
+        _fsmInjector = new StateModelDecoder( _decoder );
+    }
 
-		/**
-		 * @private
-		 */
-		private var _fsmInjector:IStateModelInjector;
+    public function addClass( commandClass:Class ):Boolean {
+        return _decoder.addClass( commandClass );
+    }
 
-		/**
-		 * @private
-		 */
-		private var _stateMachine:BaseStateMachine;
+    public function inject():void {
+        _fsmInjector.inject( _stateModel );
+        _injector.mapValue( IFSMController, _stateMachine );
+        _injector.mapValue( IFSMProperties, _stateMachine );
+        _injector.mapValue( IStateProvider, _stateModel );
+        _stateMachine.transitionToInitialState();
+    }
 
-		/**
-		 * @private
-		 */
-		private var _model:IStateModelOwner;
 
-		/**
-		 * Creates an instance of the injector
-		 * @param injector the IInjector into which the StateMachine elements will be injected
-		 * @param signalCommandMap the ISignalCommandMap in which the commands will be mapped
-		 * to each states' Signals
-		 */
-		public function SignalFSMInjector( injector:IInjector, signalCommandMap:IGuardedSignalCommandMap ){
-			_injector = injector;
-			_signalCommandMap = signalCommandMap;
-		}
-
-		/**
-		 * Initiates the Injector
-		 * @param stateDefinition the StateMachine declaration
-		 */
-		public function initiate( stateDefinition:XML, logger:IStateLogger=null ):void{
-			// create a SignalStateDecoder and pass it the State Declaration
-			_decoder = new SignalXMLStateDecoder( stateDefinition, _injector, _signalCommandMap );
-			// add it the FSMInjector
-			_fsmInjector = new StateModelInjector( _decoder );
-
-            _model = new StateModel();
-			_stateMachine = new SignalTransitionController( _model, logger );
-		}
-
-		/**
-		 * Adds a commandClass to the decoder.
-		 *
-		 * Any Command declared in the StateDeclaration must be added before the StateMachine is injected
-		 * @param commandClass a command Class reference
-		 * @return Whether the command Class was added successfully
-		 */
-		public function addClass( commandClass:Class ):Boolean{
-			return _decoder.addClass( commandClass );
-		}
-
-		/**
-		 * Injects the StateMachine
-		 */
-		public function inject():void{
-
-             _fsmInjector.inject( _model );
-
-			// inject the statemachine (mainly to make sure that it doesn't get GCd )
-			_injector.mapValue( IFSMController, _stateMachine );
-
-			// inject the fsmController to allow actors to control fsm
-			_injector.mapValue( IFSMProperties, _stateMachine );
-
-            _injector.mapValue( IStateModel, _model );
-
-            _stateMachine.transitionToInitialState();
-
-		}
-
-		/**
-		 * The destroy method for GC.
-		 *
-		 * NB Once injected the instance is no longer needed, so it can be destroyed
-		 */
-		public function destroy():void{
-			_fsmInjector.destroy();
-			_fsmInjector = null;
-			_decoder = null;
-			_injector = null;
-			_signalCommandMap = null;
-
-			_stateMachine = null;
-			_model = null;
-		}
-	}
+}
 }

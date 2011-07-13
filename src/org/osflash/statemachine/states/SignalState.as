@@ -1,187 +1,91 @@
-/*
- ADAPTED FOR ROBOTLEGS FROM:
- PureMVC AS3 Utility - StateMachine
- Copyright (c) 2008 Neil Manuell, Cliff Hall
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.osflash.statemachine.states {
-	import org.osflash.signals.ISignal;
-	import org.osflash.signals.Signal;
-	import org.osflash.statemachine.base.BaseState;
-	import org.osflash.statemachine.core.ISignalState;
-	import org.osflash.statemachine.signals.Cancelled;
-	import org.osflash.statemachine.signals.Entered;
-	import org.osflash.statemachine.signals.EnteringGuard;
-	import org.osflash.statemachine.signals.ExitingGuard;
-	import org.osflash.statemachine.signals.TearDown;
 
-	/**
-	 * A SignalState defines five transition phases as Signals. 
-	 */
-	public class SignalState extends BaseState implements ISignalState {
+import org.osflash.signals.ISignal;
+import org.osflash.signals.Signal;
+import org.osflash.statemachine.base.BaseState;
+import org.osflash.statemachine.core.ISignalState;
+import org.osflash.statemachine.core.ISignalStateOwner;
+import org.osflash.statemachine.signals.Cancelled;
+import org.osflash.statemachine.signals.Entered;
+import org.osflash.statemachine.signals.EnteringGuard;
+import org.osflash.statemachine.signals.ExitingGuard;
+import org.osflash.statemachine.signals.TearDown;
 
-		/**
-		 * @private
-		 */
-		protected var _enteringGuard:Signal;
+public class SignalState extends BaseState implements ISignalState, ISignalStateOwner {
 
-		/**
-		 * @private
-		 */
-		protected var _exitingGuard:Signal;
+    protected var _enteringGuard:Signal;
+    protected var _exitingGuard:Signal;
+    protected var _entered:Signal;
+    protected var _tearDown:Signal;
+    protected var _cancelled:Signal;
 
-		/**
-		 * @private
-		 */
-		protected var _entered:Signal;
+    public function SignalState( name:String, index:uint ):void {
+        super( name, index );
+    }
 
-		/**
-		 * @private
-		 */
-		protected var _tearDown:Signal;
+    public function get hasEntered():Boolean {
+        return ( _entered != null);
+    }
 
-		/**
-		 * @private
-		 */
-		protected var _cancelled:Signal;
+    public function get hasEnteringGuard():Boolean {
+        return ( _enteringGuard != null);
+    }
 
-		/**
-		 * Creates an instance of a SignalState.
-		 *
-		 * @param name the id of the state
-		 */
-		public function SignalState( name:String ):void{
-			super( name );
-		}
+    public function get hasExitingGuard():Boolean {
+        return ( _exitingGuard != null);
+    }
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get entered():ISignal{
-			if( _entered == null )_entered = new Entered( );
-			return _entered;
-		}
+    public function get hasCancelled():Boolean {
+        return ( _cancelled != null);
+    }
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get enteringGuard():ISignal{
-			if( _enteringGuard == null ) _enteringGuard = new EnteringGuard();
-			return _enteringGuard
-		}
+    public function get hasTearDown():Boolean {
+        return ( _tearDown != null);
+    }
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get exitingGuard():ISignal{
-			if( _exitingGuard == null ) _exitingGuard = new ExitingGuard();
-			return _exitingGuard;
-		}
+    public function get entered():ISignal {
+        return _entered || ( _entered = new Entered() );
+    }
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get cancelled():ISignal{
-			if( _cancelled == null ) _cancelled = new Cancelled();
-			return _cancelled;
-		}
+    public function get enteringGuard():ISignal {
+        return _enteringGuard || ( _enteringGuard = new EnteringGuard() );
+    }
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get tearDown():ISignal{
-			if( _tearDown == null ) _tearDown = new TearDown();
-			return _tearDown;
-		}
+    public function get exitingGuard():ISignal {
+        return _exitingGuard || ( _exitingGuard = new ExitingGuard() );
+    }
 
-		/**
-		 * Called by the SignalTransitionController to dispatch all <strong>enteringGuard</strong>
-		 * phase listeners.
-		 * @param payload the data broadcast with the transition phase.
-		 */
-		public function dispatchEnteringGuard( payload:Object ):void{
-			if( _enteringGuard == null || _enteringGuard.numListeners < 0 ) return;
-			_enteringGuard.dispatch( payload );
-		}
+    public function get cancelled():ISignal {
+        return _cancelled || ( _cancelled = new Cancelled() );
+    }
 
-		/**
-		 * Called by the SignalTransitionController to dispatch all <strong>exitingGuard</strong>
-		 * phase listeners.
-		 * @param payload the data broadcast with the transition phase.
-		 */
-		public function dispatchExitingGuard( payload:Object ):void{
-			if( _exitingGuard == null || _exitingGuard.numListeners < 0 ) return;
-			_exitingGuard.dispatch( payload );
-		}
+    public function get tearDown():ISignal {
+        return _tearDown || ( _tearDown = new TearDown() );
+    }
 
-		/**
-		 * Called by the SignalTransitionController to dispatch all <strong>tearDown</strong>
-		 * phase listeners.
-		 */
-		public function dispatchTearDown():void{
-			if( _tearDown == null || _tearDown.numListeners < 0 ) return;
-			_tearDown.dispatch();
-		}
+    public function dispatchEnteringGuard( payload:Object ):void {
+        if ( _enteringGuard == null || _enteringGuard.numListeners < 0 ) return;
+        _enteringGuard.dispatch( payload );
+    }
 
-		/**
-		 * Called by the SignalTransitionController to dispatch all <strong>cancelled</strong>
-		 * phase listeners.
-		 * @param reason the reason given for the cancellation
-		 * @param payload the data broadcast with the transition phase.
-		 */
-		public function dispatchCancelled( reason:String, payload:Object ):void{
-			if( _cancelled == null || _cancelled.numListeners < 0 ) return;
-			_cancelled.dispatch( reason, payload );
-		}
+    public function dispatchExitingGuard( payload:Object ):void {
+        if ( _exitingGuard == null || _exitingGuard.numListeners < 0 ) return;
+        _exitingGuard.dispatch( payload );
+    }
 
-		/**
-		 * Called by the SignalTransitionController to dispatch all <strong>entered</strong>
-		 * phase listeners.
-		 * @param payload the data broadcast with the transition phase.
-		 */
-		public function dispatchEntered( payload:Object ):void{
-			if( _entered == null || _entered.numListeners < 0 ) return;
-			_entered.dispatch( payload );
-		}
+    public function dispatchTearDown():void {
+        if ( _tearDown == null || _tearDown.numListeners < 0 ) return;
+        _tearDown.dispatch();
+    }
 
-		/**
-		 * The destroy method for gc
-		 */
-		override public function destroy():void{
-			
-			if(_entered != null) _entered.removeAll();
-			if(_enteringGuard != null) _enteringGuard.removeAll();
-			if(_exitingGuard != null) _exitingGuard.removeAll();
-			if(_tearDown != null) _tearDown.removeAll();
-			if(_cancelled != null) _cancelled.removeAll();
+    public function dispatchCancelled( reason:String, payload:Object ):void {
+        if ( _cancelled == null || _cancelled.numListeners < 0 ) return;
+        _cancelled.dispatch( reason, payload );
+    }
 
-			_entered = null;
-			_enteringGuard = null;
-			_exitingGuard = null;
-			_tearDown = null;
-			_cancelled = null;
-
-			super.destroy();
-		}
-
-		public function get hasEntered():Boolean{
-			return ( _entered != null);
-		}
-
-		public function get hasEnteringGuard():Boolean{
-			return ( _enteringGuard != null);
-		}
-
-		public function get hasExitingGuard():Boolean{
-			return ( _exitingGuard != null);
-		}
-
-		public function get hasCancelled():Boolean{
-			return ( _cancelled != null);
-		}
-
-		public function get hasTearDown():Boolean{
-			return ( _tearDown != null);
-		}
-	}
+    public function dispatchEntered( payload:Object ):void {
+        if ( _entered == null || _entered.numListeners < 0 ) return;
+        _entered.dispatch( payload );
+    }
+}
 }
