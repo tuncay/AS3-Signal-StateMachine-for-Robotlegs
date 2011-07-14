@@ -34,8 +34,6 @@ internal class CommandClassDeclaration {
         _guardCommandClassNames = decodeGuards( commandClassDef.guardClass.@classPath );
     }
 
-
-
     private function decodeGuards( list:XMLList ):Vector.<String> {
         if ( list.length() == 0 )return null;
         var a:Vector.<String> = new <String>[];

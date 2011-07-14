@@ -33,7 +33,7 @@ internal class StateSignalCommandMappingDecoder {
     }
 
     private function mapPhaseCmdDeclarationsToPhaseSignal( phaseDef:XMLList, phaseSignal:ISignal ):void {
-        var decoder:PhaseCommandDeclarationDecoder = new PhaseCommandDeclarationDecoder( phaseDef );
+        var decoder:PhaseCommandDecoder = new PhaseCommandDecoder( phaseDef );
         if ( decoder.isNull ) return;
         const e:Vector.<String>   = decoder.mapPhaseCommandsToSignal( phaseSignal, _phaseSignalCOmmandMapper );
         _errors.concat( e );

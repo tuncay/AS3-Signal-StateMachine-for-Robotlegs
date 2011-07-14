@@ -3,7 +3,7 @@ package org.osflash.statemachine.decoding {
 import org.osflash.signals.ISignal;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 
-public class PhaseSignalCommandMapper {
+public class PhaseSignalCommandMapper implements IPhaseSignalMapper {
 
     private var _signalCommandMap:IGuardedSignalCommandMap;
     private var _classMap:ClassMap;
@@ -11,13 +11,11 @@ public class PhaseSignalCommandMapper {
 
     public function PhaseSignalCommandMapper( signalCommandMap:IGuardedSignalCommandMap, classMap:ClassMap ) {
         _signalCommandMap = signalCommandMap;
-
-
         _classMap = classMap;
         _errors = new <String>[];
     }
 
-    public function mapCommandClassToPhaseSignal( item:CommandClassDeclaration, signal:ISignal ):Vector.<String> {
+    public function mapToPhaseSignal( item:CommandClassDeclaration, signal:ISignal ):Vector.<String> {
         if ( item.guardCommandClassNames == null ) {
             mapUnguardedCommands( item, signal );
         } else {

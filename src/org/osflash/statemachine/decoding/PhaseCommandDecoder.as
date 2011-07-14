@@ -2,12 +2,11 @@ package org.osflash.statemachine.decoding {
 
 import org.osflash.signals.ISignal;
 
-internal class PhaseCommandDeclarationDecoder {
+internal class PhaseCommandDecoder {
 
     internal var decodedItems:Vector.<CommandClassDeclaration>;
 
-    public function PhaseCommandDeclarationDecoder( phaseDef:XMLList ):void {
-
+    public function PhaseCommandDecoder( phaseDef:XMLList ):void {
         decode( phaseDef );
     }
 
@@ -25,10 +24,10 @@ internal class PhaseCommandDeclarationDecoder {
         }
     }
 
-    public function mapPhaseCommandsToSignal( signal:ISignal, mapper:PhaseSignalCommandMapper ):Vector.<String> {
+    public function mapPhaseCommandsToSignal( signal:ISignal, mapper:IPhaseSignalMapper ):Vector.<String> {
         var e:Vector.<String> = new <String>[];
         for each ( var item:CommandClassDeclaration in decodedItems ) {
-            e = mapper.mapCommandClassToPhaseSignal( item, signal );
+            e = mapper.mapToPhaseSignal( item, signal );
         }
         return e;
     }
