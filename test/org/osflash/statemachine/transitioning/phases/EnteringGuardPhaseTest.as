@@ -6,7 +6,6 @@ import org.hamcrest.object.isTrue;
 
 public class EnteringGuardPhaseTest extends BaseSignalStatePhaseTest {
 
-
     [Test]
     public function dispatch_returns_true_if_transition_has_not_been_cancelled():void {
         assertThat( _testSubject.dispatch(), isTrue() );
@@ -45,7 +44,7 @@ public class EnteringGuardPhaseTest extends BaseSignalStatePhaseTest {
         assertThat( got, equalTo( expected ) );
     }
 
-      private function setPropsAndDispatch( hasBeenCancelled:Boolean, hasSignal:Boolean ):void {
+    private function setPropsAndDispatch( hasBeenCancelled:Boolean, hasSignal:Boolean ):void {
         _model.hasTransitionBeenCancelled = hasBeenCancelled;
         _targetState.hasSignal = hasSignal;
         _testSubject.dispatch();
