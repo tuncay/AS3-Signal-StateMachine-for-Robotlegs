@@ -21,7 +21,7 @@ public class ClassMap {
         return null;
     }
 
-    private function reflectorMap():Vector.<IClassReflector> {
+    private function get reflectorMap():Vector.<IClassReflector> {
         return _reflectorMap || ( _reflectorMap = new <IClassReflector>[]);
     }
 
