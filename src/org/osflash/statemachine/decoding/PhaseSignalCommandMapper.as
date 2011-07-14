@@ -17,7 +17,7 @@ public class PhaseSignalCommandMapper {
         _errors = new <String>[];
     }
 
-    public function mapCommandClassToPhaseSignal( item:CommandClassElementVO, signal:ISignal ):Vector.<String> {
+    public function mapCommandClassToPhaseSignal( item:CommandClassDeclaration, signal:ISignal ):Vector.<String> {
         if ( item.guardCommandClassNames == null ) {
             mapUnguardedCommands( item, signal );
         } else {
@@ -26,7 +26,7 @@ public class PhaseSignalCommandMapper {
         return _errors;
     }
 
-    private function mapUnguardedCommands( item:CommandClassElementVO, signal:ISignal ):void {
+    private function mapUnguardedCommands( item:CommandClassDeclaration, signal:ISignal ):void {
         var commandClass:Class = getAndValidateClass( item.commandClassName );
         if( commandClass == null )return;
         if ( !hasMapping( signal, commandClass ) )  {
@@ -36,7 +36,7 @@ public class PhaseSignalCommandMapper {
         }
     }
 
-    private function mapGuardedSignalCommand( item:CommandClassElementVO, signal:ISignal ):void {
+    private function mapGuardedSignalCommand( item:CommandClassDeclaration, signal:ISignal ):void {
         var guardClasses:Array = retrieveGuardClasses( item );
         var commandClass:Class = getAndValidateClass( item.commandClassName );
         var fallBackCommandClass:Class = ( item.hasFallback ) ? getAndValidateClass( item.fallbackCommandClassName ) : null;
@@ -46,7 +46,7 @@ public class PhaseSignalCommandMapper {
             _signalCommandMap.mapGuardedSignalWithFallback( signal, commandClass, fallBackCommandClass, guardClasses );
     }
 
-    private function retrieveGuardClasses( item:CommandClassElementVO ):Array  {
+    private function retrieveGuardClasses( item:CommandClassDeclaration ):Array  {
          var returnValue:Array = [];
         for each ( var guardClassName:String in item.guardCommandClassNames ) {
             var g:Class = getAndValidateClass( guardClassName );

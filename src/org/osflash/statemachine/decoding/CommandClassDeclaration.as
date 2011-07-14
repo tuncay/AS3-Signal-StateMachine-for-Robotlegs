@@ -1,17 +1,23 @@
 package org.osflash.statemachine.decoding {
 
-internal class CommandClassElementVO {
+internal class CommandClassDeclaration {
 
     private var _commandClassName:String;
     private var _fallbackCommandClassName:String;
     private var _guardCommandClassNames:Vector.<String>;
 
-    public function CommandClassElementVO( commandClassDef:XML ) {
+    public function CommandClassDeclaration( commandClassDef:XML ) {
         decode( commandClassDef );
     }
 
     public function get commandClassName():String {
         return _commandClassName;
+    }
+
+     public function get hasFallback():Boolean {
+        return ( _fallbackCommandClassName != null ) &&
+               ( _fallbackCommandClassName != "" ) &&
+               (_guardCommandClassNames != null );
     }
 
     public function get fallbackCommandClassName():String {
@@ -24,13 +30,11 @@ internal class CommandClassElementVO {
 
     public function decode( commandClassDef:XML ):void {
         _commandClassName = commandClassDef.@classPath.toString();
-        _fallbackCommandClassName = commandClassDef.@fallback.toString();
+        _fallbackCommandClassName = (commandClassDef.@fallback == undefined ) ? null : commandClassDef.@fallback.toString();
         _guardCommandClassNames = decodeGuards( commandClassDef.guardClass.@classPath );
     }
 
-    public function get hasFallback():Boolean {
-        return ( _fallbackCommandClassName != null ) && ( _fallbackCommandClassName != "" );
-    }
+
 
     private function decodeGuards( list:XMLList ):Vector.<String> {
         if ( list.length() == 0 )return null;

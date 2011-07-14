@@ -4,7 +4,7 @@ import org.osflash.signals.ISignal;
 
 internal class PhaseCommandDeclarationDecoder {
 
-    internal var decodedItems:Vector.<CommandClassElementVO>;
+    internal var decodedItems:Vector.<CommandClassDeclaration>;
 
     public function PhaseCommandDeclarationDecoder( phaseDef:XMLList ):void {
 
@@ -17,17 +17,17 @@ internal class PhaseCommandDeclarationDecoder {
 
     private function decode( phaseDef:XMLList ):void {
         if ( phaseDef.length() == 0 )return;
-        decodedItems = new <CommandClassElementVO>[];
+        decodedItems = new <CommandClassDeclaration>[];
         var commandClasses:XMLList = phaseDef.commandClass;
         for each ( var xml:XML in commandClasses ) {
-            var item:CommandClassElementVO = new CommandClassElementVO( xml );
+            var item:CommandClassDeclaration = new CommandClassDeclaration( xml );
             decodedItems.push( item );
         }
     }
 
     public function mapPhaseCommandsToSignal( signal:ISignal, mapper:PhaseSignalCommandMapper ):Vector.<String> {
         var e:Vector.<String> = new <String>[];
-        for each ( var item:CommandClassElementVO in decodedItems ) {
+        for each ( var item:CommandClassDeclaration in decodedItems ) {
             e = mapper.mapCommandClassToPhaseSignal( item, signal );
         }
         return e;
