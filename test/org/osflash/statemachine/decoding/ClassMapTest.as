@@ -13,7 +13,6 @@ public class ClassMapTest {
 
     private var _testSubject:ClassMap;
 
-
     [Before]
     public function before():void {
         _testSubject = new ClassMap();
@@ -80,7 +79,6 @@ public class ClassMapTest {
         addThreeClasses();
         assertThat( _testSubject.getClass( "org.osflash.statemachine.signals::CancelledTest" ), strictlyEqualTo( CancelledTest ) );
     }
-
 
     private function addThreeClasses():void {
         _testSubject.addClass( ClassMapTest );

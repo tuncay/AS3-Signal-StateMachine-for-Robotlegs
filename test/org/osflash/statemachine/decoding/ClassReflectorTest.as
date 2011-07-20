@@ -56,7 +56,5 @@ public class ClassReflectorTest {
     public function equals_against_FQCP_returns_true():void {
         assertThat( _testSubject.equals( "org.osflash.statemachine.decoding::ClassReflectorTest" ), isTrue() );
     }
-
-
 }
 }

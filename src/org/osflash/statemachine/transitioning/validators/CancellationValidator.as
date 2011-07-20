@@ -9,8 +9,8 @@ public class CancellationValidator implements ITransitionValidator {
 
     public function validate( model:IFSMProperties ):Boolean {
         const transitionPhase:IUID = model.transitionPhase;
-        return ( transitionPhase.equals( SignalStateTransitionPhases.ENTERING_GUARD ) ||
-                 transitionPhase.equals( SignalStateTransitionPhases.EXITING_GUARD ) );
+        return ( SignalStateTransitionPhases.ENTERING_GUARD.equals( transitionPhase ) ||
+                 SignalStateTransitionPhases.EXITING_GUARD.equals( transitionPhase ) );
 
 
     }

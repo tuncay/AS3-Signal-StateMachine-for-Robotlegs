@@ -8,6 +8,9 @@ import org.osflash.statemachine.core.IStateProvider;
 import org.osflash.statemachine.decoding.IStateModelDecoder;
 import org.osflash.statemachine.decoding.SignalXMLStateDecoder;
 import org.osflash.statemachine.decoding.StateModelDecoder;
+import org.osflash.statemachine.decoding.StateXMLValidator;
+import org.osflash.statemachine.decoding.helpers.ICreatable;
+import org.osflash.statemachine.decoding.helpers.SignalPhaseDecoderFactory;
 import org.osflash.statemachine.model.IPhaseModel;
 import org.osflash.statemachine.model.IStateModel;
 import org.osflash.statemachine.model.ITransitionModel;
@@ -46,10 +49,12 @@ public class SignalFSMInjector {
         const phaseModel:IPhaseModel = new PhaseModel( stateModel, transitionProperties );
         const phaseDispatcher:IPhaseDispatcher = new SignalStatePhaseDispatcher( phaseModel, logger );
         const transitionController:ITransitionController = new TransitionController( transitionModel, phaseDispatcher );
+        const decoderFactory:ICreatable = new SignalPhaseDecoderFactory( _signalCommandMap );
         _stateModel = stateModel;
         _stateMachine = new StateMachine( transitionModel, transitionController );
         _stateMachine.setValidators( new TransitionValidator(), new CancellationValidator() );
-        _decoder = new SignalXMLStateDecoder( stateDefinition, _injector, _signalCommandMap );
+        _decoder = new SignalXMLStateDecoder(  decoderFactory );
+        _decoder.setData( new StateXMLValidator( stateDefinition ) );
         _fsmInjector = new StateModelDecoder( _decoder );
     }
 
