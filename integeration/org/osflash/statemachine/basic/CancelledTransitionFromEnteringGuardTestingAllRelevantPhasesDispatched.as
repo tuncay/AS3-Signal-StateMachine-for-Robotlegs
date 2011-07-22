@@ -1,4 +1,4 @@
-package basic {
+package org.osflash.statemachine.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -16,7 +16,7 @@ import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class CancelledTransitionFromExitingGuardTestingAllRelevantPhasesDispatched {
+public class CancelledTransitionFromEnteringGuardTestingAllRelevantPhasesDispatched {
 
     [Before]
     public function before():void {
@@ -31,9 +31,10 @@ public class CancelledTransitionFromExitingGuardTestingAllRelevantPhasesDispatch
     }
 
     [Test]
-    public function cancelled_transition_from_currentState_exitingGuard__only_relevant_phases_dispatched_with_params():void {
+    public function cancelled_transition_from_targetState_enteringGuard__only_relevant_phases_dispatched_with_params():void {
 
         const expected:String = "[ current:: phase/exitingGuard | payload/one ]," +
+                                "[ target:: phase/enteringGuard | payload/one ]," +
                                 "[ current:: phase/cancelled | reason/testing | payload/one ]";
 
         addListenersToAllCurrentStatePhases();
@@ -46,14 +47,14 @@ public class CancelledTransitionFromExitingGuardTestingAllRelevantPhasesDispatch
 
     private function addListenersToAllTargetStatePhases():void {
         _targetState.exitingGuard.addOnce( logPayloadPhaseForTarget );
-        _targetState.enteringGuard.addOnce( logPayloadPhaseForTarget );
+        _targetState.enteringGuard.addOnce( logAndCancelFromEnteringGuardPhaseForTarget );
         _targetState.entered.addOnce( logPayloadPhaseForTarget );
         _targetState.tearDown.addOnce( logTearDownPhaseForTarget );
         _targetState.cancelled.addOnce( logCancelledPhaseForTarget );
     }
 
     private function addListenersToAllCurrentStatePhases():void {
-        _currentState.exitingGuard.addOnce( logAndCancelFromExitingGuardPhaseForCurrent );
+        _currentState.exitingGuard.addOnce( logPayloadPhaseForCurrent );
         _currentState.enteringGuard.addOnce( logPayloadPhaseForCurrent );
         _currentState.entered.addOnce( logPayloadPhaseForCurrent );
         _currentState.tearDown.addOnce( logTearDownPhaseForCurrent );
@@ -64,8 +65,8 @@ public class CancelledTransitionFromExitingGuardTestingAllRelevantPhasesDispatch
         _results.push( "[ current:: " + _fsmProperties.transitionPhase + " | " + payload.body + " ]" );
     }
 
-    private function logAndCancelFromExitingGuardPhaseForCurrent( payload:IPayload ):void {
-        _results.push( "[ current:: " + _fsmProperties.transitionPhase + " | " + payload.body + " ]" );
+    private function logAndCancelFromEnteringGuardPhaseForTarget( payload:IPayload ):void {
+        _results.push( "[ target:: " + _fsmProperties.transitionPhase + " | " + payload.body + " ]" );
         _fsmController.cancelStateTransition( _reason );
     }
 

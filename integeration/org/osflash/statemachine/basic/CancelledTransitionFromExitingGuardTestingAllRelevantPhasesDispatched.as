@@ -1,7 +1,10 @@
-package basic {
+package org.osflash.statemachine.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
+import org.hamcrest.object.isTrue;
+import org.hamcrest.object.nullValue;
+import org.hamcrest.object.strictlyEqualTo;
 import org.osflash.statemachine.SignalFSMInjector;
 import org.osflash.statemachine.core.IFSMController;
 import org.osflash.statemachine.core.IFSMProperties;
@@ -13,7 +16,7 @@ import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
+public class CancelledTransitionFromExitingGuardTestingAllRelevantPhasesDispatched {
 
     [Before]
     public function before():void {
@@ -28,22 +31,20 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
     }
 
     [Test]
-    public function straight_successful_transition__only_relevant_pahses_dispatched_with_params():void {
+    public function cancelled_transition_from_currentState_exitingGuard__only_relevant_phases_dispatched_with_params():void {
 
         const expected:String = "[ current:: phase/exitingGuard | payload/one ]," +
-                                "[ target:: phase/enteringGuard | payload/one ]," +
-                                "[ current:: phase/tearDown ]," +
-                                "[ target:: phase/entered | payload/one ]";
+                                "[ current:: phase/cancelled | reason/testing | payload/one ]";
 
-        addListenersToAllCurrentStatePhases(  );
-        addListenersToAllTargetStatePhases(  );
+        addListenersToAllCurrentStatePhases();
+        addListenersToAllTargetStatePhases();
 
         _fsmController.transition( "transition/test", _payloadBody );
 
         assertThat( got, equalTo( expected ) );
     }
 
-    private function addListenersToAllTargetStatePhases(  ):void {
+    private function addListenersToAllTargetStatePhases():void {
         _targetState.exitingGuard.addOnce( logPayloadPhaseForTarget );
         _targetState.enteringGuard.addOnce( logPayloadPhaseForTarget );
         _targetState.entered.addOnce( logPayloadPhaseForTarget );
@@ -51,8 +52,8 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
         _targetState.cancelled.addOnce( logCancelledPhaseForTarget );
     }
 
-    private function addListenersToAllCurrentStatePhases(  ):void {
-        _currentState.exitingGuard.addOnce( logPayloadPhaseForCurrent );
+    private function addListenersToAllCurrentStatePhases():void {
+        _currentState.exitingGuard.addOnce( logAndCancelFromExitingGuardPhaseForCurrent );
         _currentState.enteringGuard.addOnce( logPayloadPhaseForCurrent );
         _currentState.entered.addOnce( logPayloadPhaseForCurrent );
         _currentState.tearDown.addOnce( logTearDownPhaseForCurrent );
@@ -63,12 +64,17 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
         _results.push( "[ current:: " + _fsmProperties.transitionPhase + " | " + payload.body + " ]" );
     }
 
+    private function logAndCancelFromExitingGuardPhaseForCurrent( payload:IPayload ):void {
+        _results.push( "[ current:: " + _fsmProperties.transitionPhase + " | " + payload.body + " ]" );
+        _fsmController.cancelStateTransition( _reason );
+    }
+
     private function logTearDownPhaseForCurrent():void {
         _results.push( "[ current:: " + _fsmProperties.transitionPhase + " ]" );
     }
 
     private function logCancelledPhaseForCurrent( reason:String, payload:IPayload ):void {
-        _results.push( "[ current:: " + _fsmProperties.transitionPhase + reason + " | " + payload.body + " ]" );
+        _results.push( "[ current:: " + _fsmProperties.transitionPhase + " | " + reason + " | " + payload.body + " ]" );
     }
 
     private function logPayloadPhaseForTarget( payload:IPayload ):void {
@@ -76,11 +82,11 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
     }
 
     private function logTearDownPhaseForTarget():void {
-        _results.push( "[target:: " + _fsmProperties.transitionPhase + " ]" );
+        _results.push( "[ target:: " + _fsmProperties.transitionPhase + " ]" );
     }
 
     private function logCancelledPhaseForTarget( reason:String, payload:IPayload ):void {
-        _results.push( "[target:: " + _fsmProperties.transitionPhase + reason + " | " + payload.body + " ]" );
+        _results.push( "[ target:: " + _fsmProperties.transitionPhase + reason + " | " + payload.body + " ]" );
     }
 
     private function get got():String {

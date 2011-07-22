@@ -1,4 +1,4 @@
-package basic {
+package org.osflash.statemachine.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -13,7 +13,7 @@ import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class TransitionsQueuedWhenInvokedFromWithinTransition {
+public class CancelledTransitionsDoNotChangeCurrentState {
 
     [Before]
     public function before():void {
@@ -28,16 +28,21 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
     }
 
     [Test]
-    public function transitions_invoking_when_transitioning_are_queued():void {
-        _targetState.entered.addOnce( queueTransitions );
+    public function cancelling_transition_from_currentState_exitingGuard__state_does_not_change():void {
+        _currentState.exitingGuard.addOnce( cancelTransition );
         _fsmController.transition( "transition/test" );
-        assertThat( _fsmProperties.currentStateName, equalTo( "state/ending" ) );
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
     }
 
+     [Test]
+    public function cancelling_transition_from_targetState_enteringGuard__state_does_not_change():void {
+        _targetState.enteringGuard.addOnce( cancelTransition );
+        _fsmController.transition( "transition/test" );
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
+    }
 
-    private function queueTransitions( payload:IPayload ):void {
-        _fsmController.transition( "transition/save" );
-        _fsmController.transition( "transition/end" );
+    private function cancelTransition( payload:IPayload ):void {
+        _fsmController.cancelStateTransition( _reason );
     }
 
     private function initFSM():void {
@@ -90,12 +95,11 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
                           <transition name="transition/test" target="state/testing"/>
                       </state>
                       <state name="state/testing">
-                          <transition name="transition/save" target="state/saving"/>
-                      </state>
-                      <state name="state/saving">
                           <transition name="transition/end" target="state/ending"/>
                       </state>
-                      <state name="state/ending"/>
+                      <state name="state/ending">
+                          <transition name="transition/start" target="state/starting"/>
+                      </state>
                   </fsm>
     ;
 
