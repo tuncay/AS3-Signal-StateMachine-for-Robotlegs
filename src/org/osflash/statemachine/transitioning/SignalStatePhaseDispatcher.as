@@ -11,7 +11,7 @@ import org.osflash.statemachine.transitioning.phases.TearingDownPhase;
 
 public class SignalStatePhaseDispatcher extends TransitionPhaseDispatcher {
     public function SignalStatePhaseDispatcher(phaseModel:IPhaseModel, logger:IStateLogger) {
-        super( phaseModel,  logger );
+        super( phaseModel, 7, logger );
     }
 
     override protected function initialiseStateTransition():void {

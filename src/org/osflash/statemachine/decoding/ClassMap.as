@@ -5,6 +5,10 @@ public class ClassMap implements IClassMap {
     private var _reflectorMap:Vector.<IClassReflector>;
     private var _errors:Vector.<String>;
 
+    public function ClassMap( ) {
+        _reflectorMap = new <IClassReflector>[];
+    }
+
     public function get errors():Vector.<String> {
         return _errors;
     }
@@ -15,28 +19,29 @@ public class ClassMap implements IClassMap {
 
     public function addClass( value:Class ):Boolean {
         if ( hasClass( value ) ) return false;
-        reflectorMap.push( new ClassReflector( value ) );
+        _reflectorMap.push( new ClassReflector( value ) );
         return true;
     }
 
     public function hasClass( name:Object ):Boolean {
-        return ( getClass( name ) != null );
+        return ( retrieveClass( name ) != null );
     }
 
     public function getClass( name:Object ):Class {
-        for each ( var cb:ClassReflector in reflectorMap ) {
+        const classRef:Class = retrieveClass( name );
+        if(classRef == null )errorList.push( name );
+        return classRef;
+    }
+
+     private function retrieveClass( name:Object ):Class {
+        for each ( var cb:ClassReflector in _reflectorMap ) {
             if ( cb.equals( name ) ) return cb.payload;
         }
-        errorList.push( name );
         return null;
     }
 
     private function get errorList():Vector.<String> {
         return _errors || (_errors = new <String>[]);
-    }
-
-    private function get reflectorMap():Vector.<IClassReflector> {
-        return _reflectorMap || ( _reflectorMap = new <IClassReflector>[]);
     }
 
 }

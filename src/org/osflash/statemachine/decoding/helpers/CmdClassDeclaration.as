@@ -47,7 +47,8 @@ public class CmdClassDeclaration implements ICmdClassDeclaration {
         if ( list.length() == 0 )return null;
         var a:Array = [];
         for each ( var xml:XML in list ) {
-            a.push( classmap.getClass( xml.toString() ) );
+            const classRef:Class = classmap.getClass( xml.toString() ) ;
+            if(classRef != null )a.push(classRef );
         }
         return a;
     }

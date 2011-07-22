@@ -53,15 +53,6 @@ public class EnteringPhaseTest extends BaseSignalStatePhaseTest {
                                   .never() );
     }
 
-      [Test]
-    public function currentState_null__dispatchEntered_not_called():void {
-        stubCurrentStateNullPhaseDispatch();
-        _testSubject.dispatch();
-        assertThat( _currentState, received()
-                                  .method( "dispatchEntered" )
-                                  .never() );
-    }
-
     [Test]
     public function transition_not_cancelled__logPhase_called():void {
         stubFullPhaseDispatch();
@@ -102,13 +93,6 @@ public class EnteringPhaseTest extends BaseSignalStatePhaseTest {
         transitionCancelled( false );
         targetStateHasEnteringGuardSignal( false );
         stubEnteringGuardSpecificValues();
-    }
-
-    private function stubCurrentStateNullPhaseDispatch():void {
-        transitionCancelled( false );
-        targetStateHasEnteringGuardSignal( false );
-        stubEnteringGuardSpecificValues();
-        _currentState = null;
     }
 
     private function stubFullPhaseDispatch():void {

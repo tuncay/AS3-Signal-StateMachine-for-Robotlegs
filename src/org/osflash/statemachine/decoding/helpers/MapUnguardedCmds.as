@@ -8,6 +8,7 @@ public class MapUnguardedCmds implements ISignalPhaseCmdMapper {
     private var _signalCommandMap:IGuardedSignalCommandMap;
 
     public function mapToPhaseSignal( item:ICmdClassDeclaration, signal:ISignal ):void {
+        if(item.commandClass == null )return;
         _signalCommandMap.mapSignal( signal, item.commandClass );
     }
 

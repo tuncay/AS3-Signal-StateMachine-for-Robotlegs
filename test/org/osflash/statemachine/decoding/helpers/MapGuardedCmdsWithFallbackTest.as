@@ -15,13 +15,14 @@ import mx.events.ItemClickEvent;
 
 import org.flexunit.async.Async;
 import org.hamcrest.collection.array;
+import org.hamcrest.core.anything;
 import org.hamcrest.object.strictlyEqualTo;
 import org.osflash.signals.ISignal;
 import org.osflash.signals.Signal;
-import org.osflash.statemachine.supporting.GrumpyGuard;
-import org.osflash.statemachine.supporting.HappyGuard;
-import org.osflash.statemachine.supporting.SampleCommandA;
-import org.osflash.statemachine.supporting.SampleCommandB;
+import org.osflash.statemachine.support.GrumpyGuard;
+import org.osflash.statemachine.support.HappyGuard;
+import org.osflash.statemachine.support.SampleCommandA;
+import org.osflash.statemachine.support.SampleCommandB;
 import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 
@@ -61,9 +62,37 @@ public class MapGuardedCmdsWithFallbackTest {
         verify( _signalCommandMap );
     }
 
+    [Test]
+    public function null_commandClass__signal_mapping_aborted():void {
+        stubNullCmdClassDeclaration();
+        mockSignalCmdMapForNull();
+        _testSubject.mapToPhaseSignal( _cmdClassDeclaration, _signal );
+        verify( _signalCommandMap );
+    }
+
+     [Test]
+    public function null_fallbackCommandClass__signal_mapping_aborted():void {
+        stubNullFallbackCmdClassDeclaration();
+        mockSignalCmdMapForNull();
+        _testSubject.mapToPhaseSignal( _cmdClassDeclaration, _signal );
+        verify( _signalCommandMap );
+    }
+
     private function stubCmdClassDeclaration():void {
         stub( _cmdClassDeclaration ).getter( "commandClass" ).returns( SampleCommandA );
         stub( _cmdClassDeclaration ).getter( "fallbackCommandClass" ).returns( SampleCommandB );
+        stub( _cmdClassDeclaration ).getter( "guardClasses" ).returns( [HappyGuard,GrumpyGuard] );
+    }
+
+     private function stubNullCmdClassDeclaration():void {
+        stub( _cmdClassDeclaration ).getter( "commandClass" ).returns( null );
+        stub( _cmdClassDeclaration ).getter( "fallbackCommandClass" ).returns( SampleCommandB );
+        stub( _cmdClassDeclaration ).getter( "guardClasses" ).returns( [HappyGuard,GrumpyGuard] );
+    }
+
+     private function stubNullFallbackCmdClassDeclaration():void {
+        stub( _cmdClassDeclaration ).getter( "commandClass" ).returns( SampleCommandA );
+        stub( _cmdClassDeclaration ).getter( "fallbackCommandClass" ).returns( null );
         stub( _cmdClassDeclaration ).getter( "guardClasses" ).returns( [HappyGuard,GrumpyGuard] );
     }
 
@@ -72,6 +101,13 @@ public class MapGuardedCmdsWithFallbackTest {
         .method( "mapGuardedSignalWithFallback" )
         .args(  _signal, SampleCommandA, SampleCommandB, array( strictlyEqualTo( HappyGuard ), strictlyEqualTo( GrumpyGuard ) ) )
         .once();
+    }
+
+    private function mockSignalCmdMapForNull():void {
+        mock( _signalCommandMap )
+        .method( "mapGuardedSignalWithFallback" )
+        .args(  anything() )
+        .never();
     }
 
     private function initSupporting():void {

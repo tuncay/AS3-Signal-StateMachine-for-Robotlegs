@@ -14,10 +14,10 @@ import org.hamcrest.object.isTrue;
 import org.hamcrest.object.strictlyEqualTo;
 import org.osflash.statemachine.decoding.ClassMap;
 import org.osflash.statemachine.decoding.IClassMap;
-import org.osflash.statemachine.supporting.GrumpyGuard;
-import org.osflash.statemachine.supporting.HappyGuard;
-import org.osflash.statemachine.supporting.SampleCommandA;
-import org.osflash.statemachine.supporting.SampleCommandB;
+import org.osflash.statemachine.support.GrumpyGuard;
+import org.osflash.statemachine.support.HappyGuard;
+import org.osflash.statemachine.support.SampleCommandA;
+import org.osflash.statemachine.support.SampleCommandB;
 
 public class CmdClassDeclarationTest {
 

@@ -12,10 +12,11 @@ import mockolate.verify;
 
 import org.flexunit.async.Async;
 import org.hamcrest.assertThat;
+import org.hamcrest.core.anything;
 import org.hamcrest.object.strictlyEqualTo;
 import org.osflash.signals.ISignal;
 import org.osflash.signals.Signal;
-import org.osflash.statemachine.supporting.SampleCommandB;
+import org.osflash.statemachine.support.SampleCommandB;
 import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 
@@ -58,14 +59,36 @@ public class MapUnguardedCmdsTest {
                                        .once() );
     }
 
+    [Test]
+    public function null_commandClass__aborts_signal_mapping():void {
+        stubNullCmdClassDeclaration();
+        mockSignalCmdMapForNull();
+        _testSubject.mapToPhaseSignal( _cmdClassDeclaration, _signal );
+        assertThat( _signalCommandMap, received()
+                                       .method( "mapSignal" )
+                                       .args(anything() )
+                                       .never() );
+    }
+
     private function stubCmdClassDeclaration():void {
         stub( _cmdClassDeclaration ).getter( "commandClass" ).returns( SampleCommandB );
+    }
+
+    private function stubNullCmdClassDeclaration():void {
+        stub( _cmdClassDeclaration ).getter( "commandClass" ).returns( null );
     }
 
     private function mockSignalCmdMap():void {
         stub( _signalCommandMap )
         .method( "mapSignal" )
         .args( strictlyEqualTo( _signal ), strictlyEqualTo( SampleCommandB ) )
+        .once();
+    }
+
+     private function mockSignalCmdMapForNull():void {
+        stub( _signalCommandMap )
+        .method( "mapSignal" )
+        .args( anything() )
         .once();
     }
 
