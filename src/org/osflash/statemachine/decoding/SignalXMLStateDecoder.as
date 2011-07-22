@@ -22,23 +22,23 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
     override protected function decodeState( stateDef:Object, index:uint ):IState {
         var state:ISignalState = getState( stateDef, index );
 
-        if ( stateDef.entered.length != 0 )
+        if ( stateDef.entered.length() != 0 )
             decoder.decodePhase( stateDef.entered, state.entered );
 
-        if ( stateDef.enteringGuard.length != 0 )
+        if ( stateDef.enteringGuard.length() != 0 )
             decoder.decodePhase( stateDef.enteringGuard, state.enteringGuard );
 
-        if ( stateDef.exitingGuard.length != 0 )
+        if ( stateDef.exitingGuard.length() != 0 )
             decoder.decodePhase( stateDef.exitingGuard, state.exitingGuard );
 
-        if ( stateDef.tearDown.length != 0 )
+        if ( stateDef.tearDown.length() != 0 )
             decoder.decodePhase( stateDef.tearDown, state.tearDown );
 
-        if ( stateDef.cancelled.length != 0 )
+        if ( stateDef.cancelled.length() != 0 )
             decoder.decodePhase( stateDef.cancelled, state.cancelled );
 
-        if ( _classMap.hasErrors )
-            throw new StateDecodingError( COMMAND_CLASS_NOT_REGISTERED + _classMap.errors.toString() );
+        if ( classMap.hasErrors )
+            throw new StateDecodingError( COMMAND_CLASS_NOT_REGISTERED + classMap.errors.toString() );
 
         return state;
     }
@@ -60,7 +60,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
     }
 
     private function get classMap():IClassMap {
-        return _classMap || (_classMap = IClassMap( _factory.create( ICreatable ) ) );
+        return _classMap || (_classMap = IClassMap( _factory.create( IClassMap ) ) );
     }
 
     private function get decoder():ISignalPhaseDecoder {
