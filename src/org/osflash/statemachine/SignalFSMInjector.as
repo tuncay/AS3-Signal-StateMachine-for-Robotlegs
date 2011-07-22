@@ -19,6 +19,7 @@ import org.osflash.statemachine.model.PhaseModel;
 import org.osflash.statemachine.model.StateModel;
 import org.osflash.statemachine.model.TransitionModel;
 import org.osflash.statemachine.model.TransitionProperties;
+import org.osflash.statemachine.states.SignalState;
 import org.osflash.statemachine.transitioning.validators.CancellationValidator;
 import org.osflash.statemachine.transitioning.IPhaseDispatcher;
 import org.osflash.statemachine.transitioning.ITransitionController;
@@ -50,12 +51,14 @@ public class SignalFSMInjector {
         const phaseDispatcher:IPhaseDispatcher = new SignalStatePhaseDispatcher( phaseModel, logger );
         const transitionController:ITransitionController = new TransitionController( transitionModel, phaseDispatcher );
         const decoderFactory:ICreatable = new SignalPhaseDecoderFactory( _signalCommandMap );
+
         _stateModel = stateModel;
         _stateMachine = new StateMachine( transitionModel, transitionController );
         _stateMachine.setValidators( new TransitionValidator(), new CancellationValidator() );
-        _decoder = new SignalXMLStateDecoder(  decoderFactory );
+        _decoder = new SignalXMLStateDecoder( decoderFactory );
         _decoder.setData( new StateXMLValidator( stateDefinition ) );
         _fsmInjector = new StateModelDecoder( _decoder );
+        transitionProperties.currentState = new SignalState( "state/null", 0 );
     }
 
     public function addClass( commandClass:Class ):Boolean {
