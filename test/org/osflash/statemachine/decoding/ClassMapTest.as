@@ -1,6 +1,8 @@
 package org.osflash.statemachine.decoding {
 
 import org.hamcrest.assertThat;
+import org.hamcrest.collection.array;
+import org.hamcrest.object.equalTo;
 import org.hamcrest.object.isFalse;
 import org.hamcrest.object.isTrue;
 import org.hamcrest.object.nullValue;
@@ -51,7 +53,7 @@ public class ClassMapTest {
     }
 
     [Test]
-    public function getClass_returns_null_if_not_registered():void {
+    public function getClass_returns_null_if_class_not_registered():void {
         addThreeClasses();
         assertThat( _testSubject.getClass( TearDownTest ), nullValue() );
     }
@@ -78,6 +80,28 @@ public class ClassMapTest {
     public function getClass_returns_Class_against_FQCN():void {
         addThreeClasses();
         assertThat( _testSubject.getClass( "org.osflash.statemachine.signals::CancelledTest" ), strictlyEqualTo( CancelledTest ) );
+    }
+
+    [Test]
+    public function addClass_does_not_log_any_errors():void {
+        addThreeClasses();
+        assertThat( _testSubject.hasErrors, isFalse() );
+    }
+
+    [Test]
+    public function addClass__sets_hasErrors_true__when_none_registered():void {
+        addThreeClasses();
+        _testSubject.getClass( "NoneExistentClass" );
+        assertThat( _testSubject.hasErrors, isTrue() );
+    }
+
+    [Test]
+    public function getErrors__returns_list_of_classRefName_not_registered():void {
+        addThreeClasses();
+        _testSubject.getClass( "NoneExistentClassA" );
+        _testSubject.getClass( "NoneExistentClassB" );
+        _testSubject.getClass( "NoneExistentClassC" );
+        assertThat( _testSubject.errors, array( equalTo( "NoneExistentClassA" ), equalTo( "NoneExistentClassB" ), equalTo( "NoneExistentClassC" ) ) );
     }
 
     private function addThreeClasses():void {
