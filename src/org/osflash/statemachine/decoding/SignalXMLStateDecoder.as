@@ -19,7 +19,7 @@ public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
         _factory = factory
     }
 
-    override protected function decodeState( stateDef:Object, index:uint ):IState {
+    override public function decodeState( stateDef:Object, index:uint ):IState {
         var state:ISignalState = getState( stateDef, index );
 
         if ( stateDef.entered.length() != 0 )
