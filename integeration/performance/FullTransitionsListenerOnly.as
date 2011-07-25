@@ -52,7 +52,7 @@ public class FullTransitionsListenerOnly {
         const duration:Number = new Date().time - startTime;
         const results:Number = ( duration / iterations );
 
-        assertThat( results, lessThan( 0.1 ) )
+        assertThat( results, lessThan( 0.1 ) );
     }
 
     private function payloadListener( payload:IPayload):void {}

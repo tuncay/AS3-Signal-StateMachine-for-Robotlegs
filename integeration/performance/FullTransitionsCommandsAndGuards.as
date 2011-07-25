@@ -4,17 +4,16 @@ import org.hamcrest.assertThat;
 import org.hamcrest.number.lessThan;
 import org.osflash.statemachine.SignalFSMInjector;
 import org.osflash.statemachine.core.IFSMController;
-import org.osflash.statemachine.core.IPayload;
 import org.osflash.statemachine.core.ISignalState;
 import org.osflash.statemachine.core.IStateProvider;
 import org.osflash.statemachine.support.CommandA;
-import org.osflash.statemachine.support.SampleCommandA;
+import org.osflash.statemachine.support.HappyGuard;
 import org.robotlegs.adapters.SwiftSuspendersInjector;
 import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class FullTransitionsCommandOnly {
+public class FullTransitionsCommandsAndGuards {
 
 
     [Before]
@@ -43,17 +42,17 @@ public class FullTransitionsCommandOnly {
 
         const duration:Number = new Date().time - startTime;
         const results:Number = ( duration / iterations );
-        // this takes 0.11
-        assertThat( results, lessThan( 0.2 ) )
+        //takes about 0.15
+        assertThat( results, lessThan( 0.2 ) );
     }
 
     private function initFSM():void {
         const fsmInjector:SignalFSMInjector = new SignalFSMInjector( _injector, _signalCommandMap );
         fsmInjector.initiate( FSM );
-        fsmInjector.addClass(CommandA);
+        fsmInjector.addClass( CommandA );
+        fsmInjector.addClass( HappyGuard );
         fsmInjector.inject();
     }
-
 
     private function initProps():void {
         _fsmController = _injector.getInstance( IFSMController );
@@ -85,31 +84,55 @@ public class FullTransitionsCommandOnly {
                   <fsm initial="state/starting">
                       <state name="state/starting">
                           <enteringGuard>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </enteringGuard>
                           <exitingGuard>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </exitingGuard>
                           <tearDown>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </tearDown>
                           <entered>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </entered>
                           <transition name="transition/next" target="state/ending"/>
                       </state>
                       <state name="state/ending">
                           <enteringGuard>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </enteringGuard>
                           <exitingGuard>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </exitingGuard>
                           <tearDown>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </tearDown>
                           <entered>
-                              <commandClass classPath="CommandA"/>
+                              <commandClass classPath="CommandA">
+                                  <guardClass classPath="HappyGuard" />
+                                  <guardClass classPath="HappyGuard" />
+                              </commandClass>
                           </entered>
                           <transition name="transition/next" target="state/starting"/>
                       </state>
