@@ -1,19 +1,17 @@
-package org.osflash.statemachine.basic {
+package org.osflash.statemachine.integration.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
 import org.osflash.statemachine.SignalFSMInjector;
 import org.osflash.statemachine.core.IFSMController;
 import org.osflash.statemachine.core.IFSMProperties;
-import org.osflash.statemachine.core.IPayload;
-import org.osflash.statemachine.core.ISignalState;
 import org.osflash.statemachine.core.IStateProvider;
 import org.robotlegs.adapters.SwiftSuspendersInjector;
 import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class TransitionsQueuedWhenInvokedFromWithinTransition {
+public class SuccessfulTransitionsChangeCurrentStateToTarget {
 
     [Before]
     public function before():void {
@@ -28,16 +26,32 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
     }
 
     [Test]
-    public function transitions_invoking_when_transitioning_are_queued():void {
-        _targetState.entered.addOnce( queueTransitions );
+    public function first_state_is_initial_state():void {
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
+    }
+
+    [Test]
+    public function single_transition_changes_state():void {
         _fsmController.transition( "transition/test" );
+
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/testing" ) );
+    }
+
+    [Test]
+    public function two_consecutive_transitions_changes_state():void {
+        _fsmController.transition( "transition/test" );
+        _fsmController.transition( "transition/end" );
+
         assertThat( _fsmProperties.currentStateName, equalTo( "state/ending" ) );
     }
 
-
-    private function queueTransitions( payload:IPayload ):void {
-        _fsmController.transition( "transition/save" );
+    [Test]
+    public function three_consecutive_transitions_changes_state():void {
+        _fsmController.transition( "transition/test" );
         _fsmController.transition( "transition/end" );
+        _fsmController.transition( "transition/start" );
+
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
     }
 
     private function initFSM():void {
@@ -50,8 +64,6 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
         _stateModel = _injector.getInstance( IStateProvider );
         _fsmProperties = _injector.getInstance( IFSMProperties );
         _fsmController = _injector.getInstance( IFSMController );
-        _currentState = _stateModel.getState( "state/starting" ) as ISignalState;
-        _targetState = _stateModel.getState( "state/testing" ) as ISignalState;
         _payloadBody = "testing,testing,1,2,3";
         _reason = "reason/testing";
     }
@@ -68,8 +80,6 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
         _stateModel = null;
         _fsmProperties = null;
         _fsmController = null;
-        _currentState = null;
-        _targetState = null;
         _payloadBody = null;
         _reason = null;
     }
@@ -80,8 +90,6 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
     private var _stateModel:IStateProvider;
     private var _fsmProperties:IFSMProperties;
     private var _fsmController:IFSMController;
-    private var _currentState:ISignalState;
-    private var _targetState:ISignalState;
     private var _payloadBody:Object;
     private var _reason:String;
     private const FSM:XML =
@@ -90,12 +98,11 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
                           <transition name="transition/test" target="state/testing"/>
                       </state>
                       <state name="state/testing">
-                          <transition name="transition/save" target="state/saving"/>
-                      </state>
-                      <state name="state/saving">
                           <transition name="transition/end" target="state/ending"/>
                       </state>
-                      <state name="state/ending"/>
+                      <state name="state/ending">
+                          <transition name="transition/start" target="state/starting"/>
+                      </state>
                   </fsm>
     ;
 

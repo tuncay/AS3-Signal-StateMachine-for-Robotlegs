@@ -1,4 +1,4 @@
-package org.osflash.statemachine.basic {
+package org.osflash.statemachine.integration.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -13,7 +13,7 @@ import org.robotlegs.base.GuardedSignalCommandMap;
 import org.robotlegs.core.IGuardedSignalCommandMap;
 import org.robotlegs.core.IInjector;
 
-public class CancelledTransitionFlashesQueuedTransitions {
+public class TransitionsQueuedWhenInvokedFromWithinTransition {
 
     [Before]
     public function before():void {
@@ -30,19 +30,14 @@ public class CancelledTransitionFlashesQueuedTransitions {
     [Test]
     public function transitions_invoking_when_transitioning_are_queued():void {
         _targetState.entered.addOnce( queueTransitions );
-         _targetState.exitingGuard.addOnce( cancelTransitions );
         _fsmController.transition( "transition/test" );
-        assertThat( _fsmProperties.currentStateName, equalTo( "state/testing" ) );
+        assertThat( _fsmProperties.currentStateName, equalTo( "state/ending" ) );
     }
+
 
     private function queueTransitions( payload:IPayload ):void {
         _fsmController.transition( "transition/save" );
         _fsmController.transition( "transition/end" );
-         _fsmController.transition( "transition/start" );
-    }
-
-    private function cancelTransitions( payload:IPayload):void {
-        _fsmController.cancelStateTransition( _reason );
     }
 
     private function initFSM():void {
@@ -100,9 +95,7 @@ public class CancelledTransitionFlashesQueuedTransitions {
                       <state name="state/saving">
                           <transition name="transition/end" target="state/ending"/>
                       </state>
-                      <state name="state/ending">
-                          <transition name="transition/start" target="state/starting"/>
-                      </state>
+                      <state name="state/ending"/>
                   </fsm>
     ;
 

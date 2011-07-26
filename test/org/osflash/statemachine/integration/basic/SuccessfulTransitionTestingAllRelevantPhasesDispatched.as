@@ -1,4 +1,4 @@
-package org.osflash.statemachine.basic {
+package org.osflash.statemachine.integration.basic {
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
