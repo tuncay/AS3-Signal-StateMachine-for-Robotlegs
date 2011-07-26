@@ -9,7 +9,7 @@ import org.osflash.statemachine.states.SignalState;
 
 public class SignalXMLStateDecoder extends BaseXMLStateDecoder {
 
-    private static const COMMAND_CLASS_NOT_REGISTERED:String = "These commands need to be added to the StateDecoder: ";
+    private static const COMMAND_CLASS_NOT_REGISTERED:String = "These classes need to be added to the StateDecoder: ";
     private static const COMMAND_CLASS_CAN_BE_MAPPED_ONCE_ONLY_TO_SAME_SIGNAL:String = "A command class can be mapped once only to the same signal: ";
 
     private var _classMap:IClassMap;
