@@ -30,14 +30,15 @@ public class TransitionsQueuedWhenInvokedFromWithinTransition {
     [Test]
     public function transitions_invoking_when_transitioning_are_queued():void {
         _targetState.entered.addOnce( queueTransitions );
-        _fsmController.transition( "transition/test" );
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.transition();
         assertThat( _fsmProperties.currentStateName, equalTo( "state/ending" ) );
     }
 
 
     private function queueTransitions( payload:IPayload ):void {
-        _fsmController.transition( "transition/save" );
-        _fsmController.transition( "transition/end" );
+        _fsmController.pushTransition( "transition/save" );
+        _fsmController.pushTransition( "transition/end" );
     }
 
     private function initFSM():void {

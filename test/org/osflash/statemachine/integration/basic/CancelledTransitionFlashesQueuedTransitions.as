@@ -31,14 +31,15 @@ public class CancelledTransitionFlashesQueuedTransitions {
     public function transitions_invoking_when_transitioning_are_queued():void {
         _targetState.entered.addOnce( queueTransitions );
          _targetState.exitingGuard.addOnce( cancelTransitions );
-        _fsmController.transition( "transition/test" );
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.transition();
         assertThat( _fsmProperties.currentStateName, equalTo( "state/testing" ) );
     }
 
     private function queueTransitions( payload:IPayload ):void {
-        _fsmController.transition( "transition/save" );
-        _fsmController.transition( "transition/end" );
-         _fsmController.transition( "transition/start" );
+        _fsmController.pushTransition( "transition/save" );
+        _fsmController.pushTransition( "transition/end" );
+         _fsmController.pushTransition( "transition/start" );
     }
 
     private function cancelTransitions( payload:IPayload):void {

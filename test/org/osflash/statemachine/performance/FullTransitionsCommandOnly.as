@@ -37,7 +37,8 @@ public class FullTransitionsCommandOnly {
         var count:int = 0;
 
         while ( count < iterations ) {
-            _fsmController.transition( "transition/next" );
+            _fsmController.pushTransition( "transition/next" );
+            _fsmController.transition();
             count++;
         }
 

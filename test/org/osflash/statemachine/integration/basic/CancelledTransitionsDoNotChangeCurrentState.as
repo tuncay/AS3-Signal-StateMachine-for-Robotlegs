@@ -30,14 +30,16 @@ public class CancelledTransitionsDoNotChangeCurrentState {
     [Test]
     public function cancelling_transition_from_currentState_exitingGuard__state_does_not_change():void {
         _currentState.exitingGuard.addOnce( cancelTransition );
-        _fsmController.transition( "transition/test" );
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.transition();
         assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
     }
 
      [Test]
     public function cancelling_transition_from_targetState_enteringGuard__state_does_not_change():void {
         _targetState.enteringGuard.addOnce( cancelTransition );
-        _fsmController.transition( "transition/test" );
+        _fsmController.pushTransition( "transition/test" );
+         _fsmController.transition();
         assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
     }
 

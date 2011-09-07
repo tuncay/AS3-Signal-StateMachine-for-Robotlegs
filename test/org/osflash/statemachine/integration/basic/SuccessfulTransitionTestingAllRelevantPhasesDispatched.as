@@ -38,7 +38,8 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched {
         addListenersToAllCurrentStatePhases(  );
         addListenersToAllTargetStatePhases(  );
 
-        _fsmController.transition( "transition/test", _payloadBody );
+        _fsmController.pushTransition( "transition/test", _payloadBody );
+        _fsmController.transition();
 
         assertThat( got, equalTo( expected ) );
     }

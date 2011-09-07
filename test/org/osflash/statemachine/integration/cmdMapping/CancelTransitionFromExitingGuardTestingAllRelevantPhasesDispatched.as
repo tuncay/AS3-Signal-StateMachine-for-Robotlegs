@@ -47,7 +47,8 @@ public class CancelTransitionFromExitingGuardTestingAllRelevantPhasesDispatched 
                                  "[ CommandG:: starting | cancelled | reason/testing | payload/one ]" ;
 
 
-        _fsmController.transition( "transition/end", _payloadBody );
+        _fsmController.pushTransition( "transition/end", _payloadBody );
+        _fsmController.transition();
 
         assertThat( got, equalTo( expected ) );
     }

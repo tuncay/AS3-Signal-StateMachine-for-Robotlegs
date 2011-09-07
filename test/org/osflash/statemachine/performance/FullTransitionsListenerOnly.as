@@ -45,7 +45,8 @@ public class FullTransitionsListenerOnly {
         _endingState.tearDown.add( tearDownListener );
 
         while ( count < iterations ) {
-            _fsmController.transition( "transition/next" );
+            _fsmController.pushTransition( "transition/next" );
+            _fsmController.transition();
             count++;
         }
 

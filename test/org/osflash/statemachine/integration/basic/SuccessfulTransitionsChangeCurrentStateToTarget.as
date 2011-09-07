@@ -32,24 +32,26 @@ public class SuccessfulTransitionsChangeCurrentStateToTarget {
 
     [Test]
     public function single_transition_changes_state():void {
-        _fsmController.transition( "transition/test" );
-
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.transition();
         assertThat( _fsmProperties.currentStateName, equalTo( "state/testing" ) );
     }
 
     [Test]
     public function two_consecutive_transitions_changes_state():void {
-        _fsmController.transition( "transition/test" );
-        _fsmController.transition( "transition/end" );
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.pushTransition( "transition/end" );
+        _fsmController.transition();
 
         assertThat( _fsmProperties.currentStateName, equalTo( "state/ending" ) );
     }
 
     [Test]
     public function three_consecutive_transitions_changes_state():void {
-        _fsmController.transition( "transition/test" );
-        _fsmController.transition( "transition/end" );
-        _fsmController.transition( "transition/start" );
+        _fsmController.pushTransition( "transition/test" );
+        _fsmController.pushTransition( "transition/end" );
+        _fsmController.pushTransition( "transition/start" );
+        _fsmController.transition();
 
         assertThat( _fsmProperties.currentStateName, equalTo( "state/starting" ) );
     }

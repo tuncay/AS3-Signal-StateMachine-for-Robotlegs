@@ -67,8 +67,9 @@ public class SuccessfulTransitionTestingAllRelevantPhasesDispatched implements I
                                 "[ CommandC:: starting | entered | payload/one ]";
 
 
-        _fsmController.transition( "transition/end", _payloadBody );
-        _fsmController.transition( "transition/start", _payloadBody );
+        _fsmController.pushTransition( "transition/end", _payloadBody );
+        _fsmController.pushTransition( "transition/start", _payloadBody );
+        _fsmController.transition();
 
         assertThat( got, equalTo( expected ) );
     }
